@@ -17,6 +17,12 @@ sys.path.append(os.path.join(here, "../vendored"))
 # referenced as `lib.something`
 import lib
 
+
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
-    return lib.get_lolz()
+
+    # Return
+    try:
+        return lib.get_json(lib.TeamsTable.scan()['Items'])
+    except lib.exceptions.ClientError as ce:
+        raise lib.exceptions.InternalServerException(ce.message)
