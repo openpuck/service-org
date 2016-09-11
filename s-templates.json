@@ -1,0 +1,54 @@
+{
+  "apiGatewayRequestTemplate": {
+    "application/json": {
+      "body": "$input.json('$')",
+      "pathParams" : "$input.params().path",
+      "queryParams" : "$input.params().querystring",
+      "pathId": "$input.params('id')"
+    }
+  },
+  "apiGatewayResponseErrorTemplate": {
+    "application/json": ""
+  },
+  "apigLookupRequestTemplate": {
+    "application/json": {
+      "body": "$input.json('$')",
+      "pathParams" : "$input.params().path",
+      "queryParams" : "$input.params().querystring",
+      "altname": "$input.params().querystring.get('altname')",
+      "location_id": "$input.params().querystring.get('location_id')",
+      "affiliation": "$input.params().querystring.get('affiliation')"
+    }
+  },
+    "apigResponsesTemplate": {
+        "400": {
+          "statusCode": "400",
+          "selectionPattern": "BadRequestException.*",
+          "responseTemplates": "$${apiGatewayResponseErrorTemplate}"
+        },
+        "404": {
+          "selectionPattern": "NotFoundException.*",
+          "statusCode": "404",
+          "responseTemplates": "$${apiGatewayResponseErrorTemplate}",
+          "responseParameters": {
+            "method.response.header.errorMessage": "integration.response.body.errorMessage"
+          }
+        },
+        "500": {
+            "selectionPattern": "InternalServerException.*",
+            "statusCode": "500",
+            "responseTemplates": "$${apiGatewayResponseErrorTemplate}",
+            "responseParameters": {
+              "method.response.header.errorMessage": "integration.response.body.errorMessage"
+            }
+        },
+        "default": {
+          "statusCode": "200",
+          "responseParameters": {},
+          "responseModels": {},
+          "responseTemplates": {
+            "application/json": ""
+          }
+       }
+    }
+}
