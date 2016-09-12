@@ -10,6 +10,7 @@ import validation
 # LocationAltnamesTable = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1').Table('location_altnames')
 # LocationAltnamesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('location_altnames')
 TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
+LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
 
 
 class DecimalEncoder(json.JSONEncoder):
