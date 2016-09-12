@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import sys
-import os
 from boto.dynamodb2.fields import HashKey, RangeKey, GlobalAllIndex
 from boto.dynamodb2.table import Table
 
+import sys, os
 here = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(here, "../"))
 from Connection import remoteconn as conn

@@ -31,3 +31,7 @@ def clear_table(conn, table_name):
 
     except JSONResponseError:
         print "Table '%s' does not exist." % table_name
+
+
+def create_table_obj(conn, table_name):
+    return Table(table_name, connection=conn)
