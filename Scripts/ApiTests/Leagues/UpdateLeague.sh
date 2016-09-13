@@ -4,10 +4,14 @@
 source ../Common.sh
 
 # Test-specific vars
-METHOD="GET"
-PAYLOAD=''
+METHOD="PUT"
 ENDPOINT="/0ea6a113-4ccf-4961-acf0-f39ec91b5a9d"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"
+output=$(${CURL} -X "GET" ${URL}${ENDPOINT})
+echo "EXISTING: $output"
+PAYLOAD=$(echo $output | sed "s/\"abbr\": \"\(.*\)\"/\"abbr\": \"$(date)\"/")
+echo "NEW:      $PAYLOAD"
+echo "Updating..."
 eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp

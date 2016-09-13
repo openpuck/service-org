@@ -22,18 +22,27 @@ from uuid import uuid4
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Auto-generate an ID
-    event['body']['id'] = str(uuid4())
-
     # Test for required attributes
-    required_keys = ['id', 'abbr', 'cn', 'website']
+    required_keys = ['abbr', 'cn', 'website']
     lib.validation.check_keys(required_keys, event)
+    lib.validation.check_keys(['pathId'], event, False)
 
-    # Add to database
+    # Update
     try:
-        lib.LeaguesTable.put_item(Item=event['body'])
+        response = lib.LeaguesTable.update_item(
+            Key={
+                'id': event['pathId']
+            },
+            UpdateExpression="set abbr = :abbr, cn = :cn, website = :website",
+            ExpressionAttributeValues={
+                ':abbr': event['body']['abbr'],
+                ':cn': event['body']['cn'],
+                ':website': event['body']['website']
+            },
+            ReturnValues="ALL_NEW"
+        )
     except lib.exceptions.ClientError as ce:
         raise lib.exceptions.InternalServerException(ce.message)
 
     # Return
-    return event['body']
+    return lib.get_json(response['Attributes'])

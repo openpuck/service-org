@@ -5,7 +5,7 @@ source ../Common.sh
 
 # Test-specific vars
 METHOD="POST"
-PAYLOAD='{"abbr": "FOOBAR", "name": "foobar", "website": "lolz"}'
+PAYLOAD='{"abbr": "FOOBAR", "cn": "foobar", "website": "lolz"}'
 ENDPOINT=""
 
 # Execute
