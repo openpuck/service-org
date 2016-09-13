@@ -1,18 +1,13 @@
 #!/bin/bash
 
-DEBUG=0
-if [[ ${DEBUG} == 1 ]]; then
-    DEBUG_OPTS="-v"
-else
-    DEBUG_OPTS=""
-fi
-# Common Stuff
-CURL="curl -s ${DEBUG_OPTS} -H 'Content-Type: application/json'"
+# Load in our common stuff.
+source ../Common.sh
 
-# Method-specific configuration
-URL="https://mkvusbh1l7.execute-api.us-east-1.amazonaws.com/dev/league"
+# Test-specific vars
 METHOD="GET"
 PAYLOAD=''
+ENDPOINT=""
 
 # Execute
-eval ${CURL} -X ${METHOD} ${URL} -d \'${PAYLOAD}\' | json_pp
+#echo "${URL}/${ENDPOINT}"
+eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp

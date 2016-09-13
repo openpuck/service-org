@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# Common Stuff
-CURL="curl -v -H 'Content-Type: application/json'"
+# Load in our common stuff.
+source ../Common.sh
 
-# Method-specific configuration
-URL="https://mkvusbh1l7.execute-api.us-east-1.amazonaws.com/dev/league"
+# Test-specific vars
 METHOD="POST"
 PAYLOAD='{"abbr": "FOOBAR", "name": "foobar", "website": "lolz"}'
+ENDPOINT=""
 
 # Execute
-eval ${CURL} -X ${METHOD} ${URL} -d \'${PAYLOAD}\' | json_pp
+#echo "${URL}/${ENDPOINT}"
+eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp

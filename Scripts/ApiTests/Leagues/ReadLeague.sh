@@ -1,5 +1,13 @@
 #!/bin/bash
 
-URL=https://mkvusbh1l7.execute-api.us-east-1.amazonaws.com/dev/league/ac99003b-845d-4cec-9c02-4dfe1acc1839
+# Load in our common stuff.
+source ../Common.sh
 
-curl -s $URL | json_pp
+# Test-specific vars
+METHOD="GET"
+PAYLOAD=''
+ENDPOINT="/00b89928-f9e0-4f8e-a066-4983e02150ec"
+
+# Execute
+#echo "${URL}/${ENDPOINT}"
+eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp
