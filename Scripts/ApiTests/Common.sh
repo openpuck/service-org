@@ -10,4 +10,4 @@ fi
 CURL="curl -s ${DEBUG_OPTS} -H 'Content-Type: application/json'"
 
 # Method-specific configuration
-URL="https://mkvusbh1l7.execute-api.us-east-1.amazonaws.com/dev/league"
+URL="https://mkvusbh1l7.execute-api.us-east-1.amazonaws.com/dev"

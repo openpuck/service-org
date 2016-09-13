@@ -6,7 +6,7 @@ source ../Common.sh
 # Test-specific vars
 METHOD="DELETE"
 PAYLOAD=''
-ENDPOINT="/883c9dbf-5aae-400e-8110-84b68cee6838"
+ENDPOINT="/league/883c9dbf-5aae-400e-8110-84b68cee6838"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"

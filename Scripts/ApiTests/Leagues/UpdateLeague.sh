@@ -5,7 +5,7 @@ source ../Common.sh
 
 # Test-specific vars
 METHOD="PUT"
-ENDPOINT="/0ea6a113-4ccf-4961-acf0-f39ec91b5a9d"
+ENDPOINT="/league/0ea6a113-4ccf-4961-acf0-f39ec91b5a9d"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"

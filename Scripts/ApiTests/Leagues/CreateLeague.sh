@@ -6,7 +6,7 @@ source ../Common.sh
 # Test-specific vars
 METHOD="POST"
 PAYLOAD='{"abbr": "FOOBAR", "cn": "foobar", "website": "lolz"}'
-ENDPOINT=""
+ENDPOINT="/league"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"
