@@ -10,14 +10,12 @@
   "apiGatewayResponseErrorTemplate": {
     "application/json": ""
   },
-  "apigLookupRequestTemplate": {
+  "apigLeagueSearchRequestTemplate": {
     "application/json": {
       "body": "$input.json('$')",
       "pathParams" : "$input.params().path",
       "queryParams" : "$input.params().querystring",
-      "altname": "$input.params().querystring.get('altname')",
-      "location_id": "$input.params().querystring.get('location_id')",
-      "affiliation": "$input.params().querystring.get('affiliation')"
+      "abbr": "$input.params().querystring.get('abbr')"
     }
   },
     "apigResponsesTemplate": {

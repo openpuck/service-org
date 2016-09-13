@@ -6,7 +6,7 @@ source ../Common.sh
 # Test-specific vars
 METHOD="GET"
 PAYLOAD=''
-ENDPOINT="/league"
+ENDPOINT="/league?abbr=NWHL"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"
