@@ -5,12 +5,9 @@ import decimal
 import validation
 import exceptions
 
-# LocationsTable = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1').Table('locations')
-# LocationsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('locations')
-# LocationAltnamesTable = boto3.resource('dynamodb', endpoint_url='http://localhost:8000', region_name='us-east-1').Table('location_altnames')
-# LocationAltnamesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('location_altnames')
 TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
 LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
+ConferencesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('conferences')
 
 
 class DecimalEncoder(json.JSONEncoder):
