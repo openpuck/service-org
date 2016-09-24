@@ -10,6 +10,7 @@ LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('league
 ConferencesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('conferences')
 
 
+# @TODO: Purge this since we shouldnt be doing much decimal stuff anymore.
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):

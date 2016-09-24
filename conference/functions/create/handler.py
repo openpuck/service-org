@@ -29,6 +29,10 @@ def handler(event, context):
     required_keys = ['id', 'cn', 'is_women', 'abbr', 'website', 'league']
     lib.validation.check_keys(required_keys, event)
 
+    # Validation
+    lib.validation.check_boolean(event, ['is_women'])
+    lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
+
     # Add to database
     try:
         lib.ConferencesTable.put_item(Item=event['body'])
