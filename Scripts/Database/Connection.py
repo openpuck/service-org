@@ -33,5 +33,22 @@ def clear_table(conn, table_name):
         print "Table '%s' does not exist." % table_name
 
 
+def ready_table(conn, table_name):
+    try:
+        our_table = Table(table_name, connection=conn)
+        if our_table.describe()['Table']['TableStatus'] == "CREATING":
+            while our_table.describe()['Table']['TableStatus'] == "CREATING":
+                print "Waiting for CREATING to be done..."
+                time.sleep(1)
+            print "Table is done."
+        else:
+            print "Table is ready."
+    except JSONResponseError:
+        print "Table '%s' does not exist." % table_name
+
+
 def create_table_obj(conn, table_name):
-    return Table(table_name, connection=conn)
+    ready_table(conn, table_name)
+    MyTable = Table(table_name, connection=conn)
+    MyTable.use_boolean()
+    return MyTable
