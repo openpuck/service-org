@@ -16,7 +16,7 @@ clear_table(conn, table_name)
 ConfByLeagueGenderIndex = GlobalAllIndex("ConfByLeagueGender",
                                          parts=[
                                              HashKey("league"),
-                                             RangeKey("is_women", data_type=NUMBER)
+                                             RangeKey("is_women")
                                          ],
                                          throughput={
                                              'read': 1,
