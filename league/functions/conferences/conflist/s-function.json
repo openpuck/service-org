@@ -1,0 +1,25 @@
+{
+  "name": "conflist",
+  "customName": false,
+  "customRole": false,
+  "handler": "functions/conferences/conflist/handler.handler",
+  "timeout": 3,
+  "memorySize": 128,
+  "custom": {
+    "excludePatterns": [],
+    "envVars": []
+  },
+  "endpoints": [
+    {
+      "path": "league/{id}/conferences",
+      "method": "GET",
+      "type": "AWS",
+      "authorizationType": "none",
+      "apiKeyRequired": false,
+      "requestParameters": {},
+      "requestTemplates": "$${apiGatewayRequestTemplate}",
+      "responses": "$${apigResponsesTemplate}"
+    }
+  ],
+  "events": []
+}
