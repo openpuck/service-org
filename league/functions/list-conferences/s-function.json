@@ -1,8 +1,8 @@
 {
-  "name": "conflist",
+  "name": "list-conferences",
   "customName": false,
   "customRole": false,
-  "handler": "functions/conferences/conflist/handler.handler",
+  "handler": "functions/list-conferences/handler.handler",
   "timeout": 3,
   "memorySize": 128,
   "custom": {
