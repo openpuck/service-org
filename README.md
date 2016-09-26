@@ -14,7 +14,6 @@ This service provides organizational information.
 * /league (GET, POST)
   * /{id} (GET, PUT, DELETE)
     * /conferences (GET)
-    * /seasons (GET)
 * /conference (GET, POST)
   * /{id} (GET, PUT, DELETE)
     * /teams (GET, POST)
@@ -23,6 +22,7 @@ This service provides organizational information.
   * /{id} (GET, PUT, DELETE)
 
 TODO
+* /league/{id}/seasons (GET)
 * /season (GET, POST)
   * /{id} (GET, PUT, DELETE)
 * /institution (GET, POST)
