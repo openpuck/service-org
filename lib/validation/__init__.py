@@ -65,3 +65,34 @@ def check_relation(foreign_table, key, value):
 
     if 'Item' not in response:
         raise NotFoundException("Object '%s' for relation not found in table '%s'." % (value, foreign_table.table_name))
+
+
+def check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
+                        foreign_attr, value):
+    """
+    Check a local value against a given attribute of a specific item
+    from another table.
+
+    NOTE: This will choke on more than one result. Might need to implement
+    RangeKeys at a later date.
+
+    :param foreign_table: The foreign table object.
+    :param foreign_key_attr: The foreign table HashKey attribute.
+    :param foreign_key: The key (ID) of an element in the foreign table.
+    :param foreign_attr: The attribute in the foreign table to look up.
+    :param value: The value to compare against.
+    :return: None if good, Exception if bad.
+    """
+
+    try:
+        response = foreign_table.get_item(Key={foreign_key_attr: foreign_key})
+    except ClientError as ce:
+        raise InternalServerException(ce.message)
+
+    if 'Item' not in response:
+        raise NotFoundException("Object '%s' for relation not found in table '%s'." % (value, foreign_table.table_name))
+
+    if response['Item'][foreign_attr] == value:
+        return
+
+    raise NotFoundException("Table '%s' with '%s'='%s' does not match on attribute '%s' (got '%s')" % (foreign_table.table_name, foreign_key_attr, foreign_key, foreign_attr, value))
