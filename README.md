@@ -14,17 +14,17 @@ This service provides organizational information.
 * /league (GET, POST)
   * /{id} (GET, PUT, DELETE)
     * /conferences (GET)
+    * /seasons (GET)
 * /conference (GET, POST)
   * /{id} (GET, PUT, DELETE)
     * /teams (GET, POST)
       * /teams/{id} (GET, DELETE)
 * /team (GET, POST)
   * /{id} (GET, PUT, DELETE)
-
-TODO
-* /league/{id}/seasons (GET)
 * /season (GET, POST)
   * /{id} (GET, PUT, DELETE)
+
+TODO
 * /institution (GET, POST)
   * /{id} (GET, PUT, DELETE)
     * /teams (GET)

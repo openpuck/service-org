@@ -12,6 +12,16 @@ from Connection import clear_table
 table_name = "seasons"
 clear_table(conn, table_name)
 
+LeagueGenderIndex = GlobalAllIndex("SeasonByLeagueGender",
+                                         parts=[
+                                             HashKey("league"),
+                                             RangeKey("is_women")
+                                         ],
+                                         throughput={
+                                             'read': 1,
+                                             'write': 1
+                                         })
+
 new_table = Table.create(table_name,
                          schema=[
                              HashKey("id")
@@ -21,7 +31,7 @@ new_table = Table.create(table_name,
                              'write': 1
                          },
                          global_indexes=[
-                             # AbbrIndex,
+                             LeagueGenderIndex,
                          ],
                          connection=conn)
 
