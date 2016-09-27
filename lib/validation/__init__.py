@@ -1,6 +1,6 @@
-from lib.exceptions import *
 import re
-
+from lib.exceptions import *
+from decimal import Decimal, InvalidOperation
 
 def string_length(input_string, num_chars):
     """
@@ -48,6 +48,35 @@ def check_boolean(event, keys, body=True):
             if re.match(r"yes|no", event[key]):
                 raise BadRequestException("Key '%s' contains an invalid boolean value ('%s')." % (key, event[key]))
 
+
+def check_decimal(event, keys, body=True):
+    """
+    Ensure that certain values are a valid Decimal and not a string.
+    :param event: The event object from Lambda.
+    :param keys: List of keys to test.
+    :param body: Check in the body or in the event itself.
+    :return: Nothing if success, exception if failed.
+    """
+    for key in keys:
+        if body is True:
+            if key not in event['body'].keys():
+                raise BadRequestException("Key '%s' is missing." % key)
+            try:
+                Decimal(event['body'][key])
+            except InvalidOperation:
+                raise BadRequestException(
+                    "Key '%s' contains an invalid decimal value ('%s')." % (
+                    key, event['body'][key]))
+        else:
+            if key not in event.keys():
+                raise BadRequestException("Key '%s' is missing." % key)
+            try:
+                Decimal(event[key])
+                return
+            except InvalidOperation:
+                raise BadRequestException(
+                    "Key '%s' contains an invalid decimal value ('%s')." % (
+                    key, event[key]))
 
 def check_relation(foreign_table, key, value):
     """

@@ -26,16 +26,19 @@ def handler(event, context):
     event['body']['id'] = str(uuid4())
 
     # Test for required attributes
-    required_keys = ['id', 'cn', 'is_women', 'abbr', 'website', 'league']
+    required_keys = ['id', 'is_women', 'league', 'start', 'end']
     lib.validation.check_keys(required_keys, event)
 
     # Validation
     lib.validation.check_boolean(event, ['is_women'])
+    lib.validation.check_decimal(event, ['start', 'end'])
+
+    # Relations
     lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
 
     # Add to database
     try:
-        lib.ConferencesTable.put_item(Item=event['body'])
+        lib.SeasonsTable.put_item(Item=event['body'])
     except lib.exceptions.ClientError as ce:
         raise lib.exceptions.InternalServerException(ce.message)
 

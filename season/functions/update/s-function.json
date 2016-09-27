@@ -11,7 +11,7 @@
   },
   "endpoints": [
     {
-      "path": "conference/{id}",
+      "path": "season/{id}",
       "method": "PUT",
       "type": "AWS",
       "authorizationType": "none",

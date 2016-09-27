@@ -11,7 +11,7 @@
   },
   "endpoints": [
     {
-      "path": "conference",
+      "path": "season",
       "method": "POST",
       "type": "AWS",
       "authorizationType": "none",

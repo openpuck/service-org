@@ -22,23 +22,28 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Test for required attributes
-    required_keys = ['cn', 'is_women', 'abbr', 'website', 'league']
+    required_keys = ['id', 'is_women', 'league', 'start', 'end']
     lib.validation.check_keys(required_keys, event)
-    lib.validation.check_keys(['pathId'], event, False)
+
+    # Validation
+    lib.validation.check_boolean(event, ['is_women'])
+    lib.validation.check_decimal(event, ['start', 'end'])
+
+    # Relations
+    lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
 
     # Update
     try:
-        response = lib.ConferencesTable.update_item(
+        response = lib.SeasonsTable.update_item(
             Key={
                 'id': event['pathId']
             },
-            UpdateExpression="set abbr = :abbr, cn = :cn, website = :website, is_women = :is_women, league = :league",
+            UpdateExpression="end = :end, is_women = :is_women, league = :league, start = :start",
             ExpressionAttributeValues={
-                ':abbr': event['body']['abbr'],
-                ':cn': event['body']['cn'],
-                ':website': event['body']['website'],
+                ':start': event['body']['start'],
+                ':end': event['body']['end'],
                 ':is_women': event['body']['is_women'],
-                ':league': event['body']['league']
+                ':league': event['body']['league'],
             },
             ReturnValues="ALL_NEW"
         )
