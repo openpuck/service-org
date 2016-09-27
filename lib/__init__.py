@@ -8,6 +8,7 @@ import exceptions
 TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
 LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
 ConferencesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('conferences')
+SeasonsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('seasons')
 
 
 # @TODO: Purge this since we shouldnt be doing much decimal stuff anymore.
