@@ -24,7 +24,7 @@ def handler(event, context):
 
     # Return
     try:
-        lib.ConferencesTable.delete_item(
+        lib.SeasonsTable.delete_item(
                                Key={'id': event['pathId']}
                            )
         return {}

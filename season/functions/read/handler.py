@@ -29,7 +29,7 @@ def handler(event, context):
 
     # Get response
     try:
-        response = lib.ConferencesTable.get_item(Key={'id': event['pathId']})
+        response = lib.SeasonsTable.get_item(Key={'id': event['pathId']})
     except lib.exceptions.ClientError as ce:
         raise lib.exceptions.InternalServerException(ce.message)
 
