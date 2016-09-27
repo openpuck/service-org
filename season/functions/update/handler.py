@@ -22,12 +22,12 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Test for required attributes
-    required_keys = ['id', 'is_women', 'league', 'start', 'end']
+    required_keys = ['id', 'is_women', 'league', 'start_year', 'end_year']
     lib.validation.check_keys(required_keys, event)
 
     # Validation
     lib.validation.check_boolean(event, ['is_women'])
-    lib.validation.check_decimal(event, ['start', 'end'])
+    lib.validation.check_decimal(event, ['start_year', 'end_year'])
 
     # Relations
     lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
@@ -38,10 +38,10 @@ def handler(event, context):
             Key={
                 'id': event['pathId']
             },
-            UpdateExpression="end = :end, is_women = :is_women, league = :league, start = :start",
+            UpdateExpression="set is_women = :is_women, league = :league, start_year = :start_year, end_year = :end_year",
             ExpressionAttributeValues={
-                ':start': event['body']['start'],
-                ':end': event['body']['end'],
+                ':start_year': event['body']['start_year'],
+                ':end_year': event['body']['end_year'],
                 ':is_women': event['body']['is_women'],
                 ':league': event['body']['league'],
             },

@@ -5,8 +5,8 @@ source ../Common.sh
 
 # Test-specific vars
 METHOD="PUT"
-ENDPOINT="/season/ceb73d9a-86ee-4ab7-a9da-bb78769fc584"
-SUB_ATTR="start"
+ENDPOINT="/season/d120b515-2f87-4773-8856-3f09e71b3d1d"
+SUB_ATTR="start_year"
 SUB_VALUE=2015
 
 # Existing Object

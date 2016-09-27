@@ -26,12 +26,12 @@ def handler(event, context):
     event['body']['id'] = str(uuid4())
 
     # Test for required attributes
-    required_keys = ['id', 'is_women', 'league', 'start', 'end']
+    required_keys = ['id', 'is_women', 'league', 'start_year', 'end_year']
     lib.validation.check_keys(required_keys, event)
 
     # Validation
     lib.validation.check_boolean(event, ['is_women'])
-    lib.validation.check_decimal(event, ['start', 'end'])
+    lib.validation.check_decimal(event, ['start_year', 'end_year'])
 
     # Relations
     lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
