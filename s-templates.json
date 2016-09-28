@@ -13,9 +13,19 @@
   "apigLeagueSearchRequestTemplate": {
     "application/json": {
       "body": "$input.json('$')",
+      "pathParams": "$input.params().path",
+      "queryParams": "$input.params().querystring",
+      "abbr": "$input.params().querystring.get('abbr')"
+    }
+  },
+  "apigConferenceSearchRequestTemplate": {
+    "application/json": {
+      "body": "$input.json('$')",
       "pathParams" : "$input.params().path",
       "queryParams" : "$input.params().querystring",
-      "abbr": "$input.params().querystring.get('abbr')"
+      "league_abbr": "$input.params().querystring.get('league_abbr')",
+      "conf_abbr": "$input.params().querystring.get('conf_abbr')",
+      "is_women": "$input.params().querystring.get('is_women')"
     }
   },
     "apigResponsesTemplate": {

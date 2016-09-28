@@ -17,7 +17,7 @@
       "authorizationType": "none",
       "apiKeyRequired": false,
       "requestParameters": {},
-      "requestTemplates": "$${apigLeagueSearchRequestTemplate}",
+      "requestTemplates": "$${apigConferenceSearchRequestTemplate}",
       "responses": "$${apigResponsesTemplate}"
     }
   ],

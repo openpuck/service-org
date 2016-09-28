@@ -15,10 +15,12 @@ This service provides organizational information.
   * /{id} (GET, PUT, DELETE)
     * /conferences (GET)
     * /seasons (GET)
+  * /?abbr=LEAGUE_ABBREVIATION
 * /conference (GET, POST)
   * /{id} (GET, PUT, DELETE)
     * /teams (GET, POST)
       * /teams/{id} (GET, DELETE)
+  * /?league_abbr=LEAGUE_ABBREVIATION&conf_abbr=CONFERENCE_ABBREVIATION&is_women=YES_OR_NO
 * /team (GET, POST)
   * /{id} (GET, PUT, DELETE)
 * /season (GET, POST)

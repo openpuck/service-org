@@ -6,7 +6,7 @@ source ../Common.sh
 # Test-specific vars
 METHOD="GET"
 PAYLOAD=''
-ENDPOINT="/conference"
+ENDPOINT="/conference?league_abbr=NCAA\&conf_abbr=HEA\&is_women=no"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"
