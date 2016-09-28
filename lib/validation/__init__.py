@@ -79,8 +79,8 @@ def check_decimal(event, keys, body=True):
                 Decimal(event['body'][key])
             except InvalidOperation:
                 raise BadRequestException(
-                    "Key '%s' contains an invalid decimal value ('%s')." % (
-                    key, event['body'][key]))
+                    "Key '%s' contains an invalid decimal value ('%s')." %
+                    (key, event['body'][key]))
         else:
             if key not in event.keys():
                 raise BadRequestException("Key '%s' is missing." % key)
@@ -89,8 +89,8 @@ def check_decimal(event, keys, body=True):
                 return
             except InvalidOperation:
                 raise BadRequestException(
-                    "Key '%s' contains an invalid decimal value ('%s')." % (
-                    key, event[key]))
+                    "Key '%s' contains an invalid decimal value ('%s')." %
+                    (key, event[key]))
 
 
 def check_relation(foreign_table, key, value):
