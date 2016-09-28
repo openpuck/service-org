@@ -2,17 +2,27 @@ import re
 from lib.exceptions import *
 from decimal import Decimal, InvalidOperation
 
+
 def string_length(input_string, num_chars):
     """
-    Validate a territory code.
+    Check that a given string is of the given length.
+    :param input_string: The string to test.
+    :param num_chars: The number of characters that should be in that string.
+    :return: None if success, Exception if failed.
     """
     if len(input_string) > num_chars:
-        raise BadRequestException("Value '%s' has too many characters (max: %d)." % (input_string, num_chars))
+        raise BadRequestException("Value '%s' has too many characters "
+                                  "(max: %d)." % (input_string, num_chars))
 
 
 def check_keys(keys, event, body=True):
     """
-    Test for the existance of the given list of keys in the event.
+    Check that all of the given keys exist within an event. Two code paths
+    for the ability to test the event and the event body.
+    :param keys: List of keys to test for.
+    :param event: The Lambda event object.
+    :param body: Boolean of whether to check the body or not.
+    :return: None if success, Exception if failed.
     """
     for key in keys:
         if body is True:
@@ -41,12 +51,16 @@ def check_boolean(event, keys, body=True):
             if key not in event['body'].keys():
                 raise BadRequestException("Key '%s' is missing." % key)
             if not re.match(r"^(yes|no)$", event['body'][key]):
-                raise BadRequestException("Key '%s' contains an invalid boolean value ('%s')." % (key, event['body'][key]))
+                raise BadRequestException("Key '%s' contains an invalid "
+                                          "boolean value ('%s')." %
+                                          (key, event['body'][key]))
         else:
             if key not in event.keys():
                 raise BadRequestException("Key '%s' is missing." % key)
             if re.match(r"yes|no", event[key]):
-                raise BadRequestException("Key '%s' contains an invalid boolean value ('%s')." % (key, event[key]))
+                raise BadRequestException("Key '%s' contains an invalid "
+                                          "boolean value ('%s')." %
+                                          (key, event[key]))
 
 
 def check_decimal(event, keys, body=True):
@@ -94,7 +108,9 @@ def check_relation(foreign_table, key, value):
         raise InternalServerException(ce.message)
 
     if 'Item' not in response:
-        raise NotFoundException("Object '%s' for relation not found in table '%s'." % (value, foreign_table.table_name))
+        raise NotFoundException("Object '%s' for relation not found in "
+                                "table '%s'." %
+                                (value, foreign_table.table_name))
 
 
 def check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
@@ -120,9 +136,13 @@ def check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
         raise InternalServerException(ce.message)
 
     if 'Item' not in response:
-        raise NotFoundException("Object '%s' for relation not found in table '%s'." % (value, foreign_table.table_name))
+        raise NotFoundException("Object '%s' for relation not found in table "
+                                "'%s'." % (value, foreign_table.table_name))
 
     if response['Item'][foreign_attr] == value:
         return
 
-    raise NotFoundException("Table '%s' with '%s'='%s' does not match on attribute '%s' (got '%s')" % (foreign_table.table_name, foreign_key_attr, foreign_key, foreign_attr, value))
+    raise NotFoundException("Table '%s' with '%s'='%s' does not match on "
+                            "attribute '%s' (got '%s')" %
+                            (foreign_table.table_name, foreign_key_attr,
+                             foreign_key, foreign_attr, value))
