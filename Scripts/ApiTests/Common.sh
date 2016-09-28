@@ -2,6 +2,7 @@
 
 # Test Vars
 TEST_CONFERENCE_ABBR="FOOBAR"
+TEST_CONFERENCE_IS_WOMEN="yes"
 TEST_LEAGUE_ABBR="NCAA"
 
 # Environment
@@ -25,18 +26,42 @@ perform_call() {
     local URL=$2
     local ENDPOINT=$3
     local PAYLOAD=$4
+    local NO_PRETTY=$5
 
     # Generate and run the call.
     command_string="${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d '${PAYLOAD}'"
     data=$(eval ${command_string})
 
     # Return the output.
-    echo ${data} | json_pp
+    if [ -n "${NO_PRETTY}" ]; then
+        echo ${data}
+    else
+        echo ${data} | json_pp
+    fi
+}
+
+sub_payload() {
+    # Substitute a given attribute's value for something new in a string.
+    local output=$1
+    local SUB_ATTR=$2
+    local SUB_VALUE=$3
+
+    # Thanks internet! http://stackoverflow.com/questions/1103149/non-greedy-regex-matching-in-sed
+    local PAYLOAD=$(echo ${output} | perl -pe "s|\"${SUB_ATTR}\": \"(.*?)\"|\"${SUB_ATTR}\": \"${SUB_VALUE}\"|")
+    echo ${PAYLOAD}
 }
 get_league_id() {
     # Return the id of our test league from the API so we can do easy lookups
     # with it in other functions.
     local endpoint="/league?abbr=${TEST_LEAGUE_ABBR}"
+    local league=$(perform_call "GET" ${URL} ${endpoint} "")
+    echo ${league} | jq -r '.id'
+}
+
+get_conference_id() {
+    # Return the id of our test conference from the API so we can do easy lookups
+    # with it in other functions.
+    local endpoint="/conference?league_abbr=${TEST_LEAGUE_ABBR}\&conf_abbr=${TEST_CONFERENCE_ABBR}\&is_women=${TEST_CONFERENCE_IS_WOMEN}"
     local league=$(perform_call "GET" ${URL} ${endpoint} "")
     echo ${league} | jq -r '.id'
 }

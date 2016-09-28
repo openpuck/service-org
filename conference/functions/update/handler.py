@@ -26,6 +26,10 @@ def handler(event, context):
     lib.validation.check_keys(required_keys, event)
     lib.validation.check_keys(['pathId'], event, False)
 
+    # Relations
+    lib.validation.check_relation(lib.LeaguesTable, 'id',
+                                  event['body']['league'])
+
     # Update
     try:
         response = lib.ConferencesTable.update_item(
