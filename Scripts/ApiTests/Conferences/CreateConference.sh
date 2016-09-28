@@ -3,12 +3,19 @@
 # Load in our common stuff.
 source ../Common.sh
 
-# Test-specific vars
-
-METHOD="POST"
-PAYLOAD='{"abbr": "FOOBAR", "cn": "foobar", "website": "lolz", "is_women": "yes", "league": "foobar"}'
+# Test Endpoint and Method
 ENDPOINT="/conference"
+METHOD="POST"
 
-# Execute
-#echo "${URL}/${ENDPOINT}"
-eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp
+# Payload
+read -d '' PAYLOAD << EndOfPayload
+{
+"abbr": "${TEST_CONFERENCE_ABBR}",
+"cn": "Test Conference",
+"website": "lolz",
+"is_women": "yes",
+"league": "$(get_league_id)"
+}
+EndOfPayload
+
+perform_call ${METHOD} ${URL} ${ENDPOINT} "${PAYLOAD}"

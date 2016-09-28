@@ -9,6 +9,4 @@ PAYLOAD=''
 ENDPOINT="/conference"
 
 # Execute
-#echo "${URL}/${ENDPOINT}"
-#eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\'
 eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp

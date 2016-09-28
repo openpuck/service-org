@@ -78,6 +78,7 @@ def check_decimal(event, keys, body=True):
                     "Key '%s' contains an invalid decimal value ('%s')." % (
                     key, event[key]))
 
+
 def check_relation(foreign_table, key, value):
     """
     Check a foreign table for an entry. It's basically relations, with no-SQL!

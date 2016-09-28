@@ -32,5 +32,10 @@ TODO
     * /teams (GET)
     * /leagues (GET)
 
+## Development Dependencies
+* NodeJS 4.X
+* Serverless 0.4.2
+* bash, curl, jq
+
 ## References
 Old scripts are at [the old repo](https://github.com/cohoe/OpenPuck/tree/45160b6e6987a6de2563b4bfd8b9e143553ea79c)
