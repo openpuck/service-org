@@ -20,8 +20,8 @@ Seasons.put_item(data={
     'id': 'eededae4-8219-4ae5-8d46-04e339933ecb',
     'is_women': 'no',
     'league': 'ac99003b-845d-4cec-9c02-4dfe1acc1839',
-    'start_year': 2015,
-    'end_year': 2016,
+    'start_year': 2016,
+    'end_year': 2017,
 }, overwrite=True)
 Seasons.put_item(data={
     'id': '2cf593d7-ed56-4245-81c1-af174f364ef9',

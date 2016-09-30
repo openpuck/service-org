@@ -17,3 +17,24 @@ ENDPOINT="/season"
 # Execute
 #echo "${URL}/${ENDPOINT}"
 eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp
+
+#!/bin/bash
+
+# Load in our common stuff.
+source ../Common.sh
+
+# Test Endpoint and Method
+ENDPOINT="/season"
+METHOD="POST"
+
+# Payload
+read -d '' PAYLOAD << EndOfPayload
+{
+"is_women": "yes",
+"league": "$(get_league_id)",
+"start_year": "2016",
+"end_year": "2017"
+}
+EndOfPayload
+
+perform_call ${METHOD} ${URL} ${ENDPOINT} "${PAYLOAD}"
