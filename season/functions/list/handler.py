@@ -17,6 +17,7 @@ sys.path.append(os.path.join(here, "../vendored"))
 # referenced as `lib.something`
 import lib
 from boto3.dynamodb.conditions import Key, Attr
+import decimal
 
 
 def handler(event, context):
@@ -39,8 +40,27 @@ def handler(event, context):
     #     except lib.exceptions.ClientError as ce:
     #         raise lib.exceptions.InternalServerException(ce.message)
 
-    # Regular Return
+    # Query
+    league_id = event['league']
+    start_year = event['start_year']
+    is_women = event['is_women']
+
     try:
-        return lib.get_json(lib.SeasonsTable.scan()['Items'])
+        # You have to use == or Python gets stupid.
+        if league_id == "" or start_year == "":
+            return lib.get_json(lib.SeasonsTable.scan()['Items'])
+        else:
+            # league_response = lib.LeaguesTable.get_item(Key={'id': league_id})
+
+            # Now find the conference.
+            # for league in league_result['Items']:
+            season_result = lib.SeasonsTable.query(
+                IndexName='SeasonByLeagueStart',
+                KeyConditionExpression=Key('league').eq(league_id) & Key('start_year').eq(decimal.Decimal(start_year))
+            )
+            for season in season_result['Items']:
+                if season['is_women'] == is_women:
+                    return lib.get_json(season)
+            raise lib.exceptions.NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
     except lib.exceptions.ClientError as ce:
         raise lib.exceptions.InternalServerException(ce.message)

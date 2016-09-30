@@ -28,6 +28,16 @@
       "is_women": "$input.params().querystring.get('is_women')"
     }
   },
+  "apigSeasonSearchRequestTemplate": {
+    "application/json": {
+      "body": "$input.json('$')",
+      "pathParams" : "$input.params().path",
+      "queryParams" : "$input.params().querystring",
+      "league": "$input.params().querystring.get('league')",
+      "start_year": "$input.params().querystring.get('start_year')",
+      "is_women": "$input.params().querystring.get('is_women')"
+    }
+  },
     "apigResponsesTemplate": {
         "400": {
           "statusCode": "400",

@@ -1,11 +1,13 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 # Test Vars
 TEST_CONFERENCE_ABBR="FOOBAR"
 TEST_CONFERENCE_IS_WOMEN="yes"
 TEST_LEAGUE_ABBR="NCAA"
+TEST_SEASON_START_YEAR=2015
+TEST_SEASON_IS_WOMEN="yes"
 
 # Environment
 DEBUG=0
@@ -61,11 +63,13 @@ sub_payload() {
 get_league_id() {
     # Return the id of our test league from the API so we can do easy lookups
     # with it in other functions.
+#    echoerr "BEGIN get-league_id"
     local endpoint="/league?abbr=${TEST_LEAGUE_ABBR}"
     local league=$(perform_call "GET" ${URL} ${endpoint} "")
     local league_id=$(echo ${league} | jq -r '.id')
-    echoerr "League ID:" "${league_id}"
+#    echoerr "League ID:" "${league_id}"
     echo ${league_id}
+#    echoerr "END get-league_id"
 }
 
 get_conference_id() {
@@ -76,4 +80,11 @@ get_conference_id() {
     local conference_id=$(echo ${conference} | jq -r '.id')
     echoerr "Conference ID:" "${conference_id}"
     echo ${conference_id}
+}
+
+get_season_id() {
+    # Return the id of our test season.
+    local endpoint="/season?league=$(get_league_id)&start_year=${TEST_SEASON_START_YEAR}&is_women=${TEST_SEASON_IS_WOMEN}"
+    local season=$(perform_call "GET" ${URL} ${endpoint} "")
+
 }

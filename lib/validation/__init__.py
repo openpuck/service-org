@@ -28,8 +28,9 @@ def check_keys(keys, event, body=True):
         if body is True:
             if key not in event['body'].keys():
                 raise BadRequestException("Key '%s' is missing." % key)
-            if len(event['body'][key]) is 0:
-                raise BadRequestException("Key '%s' is empty." % key)
+            if not isinstance(event['body'][key], int):
+                if len(event['body'][key]) is 0:
+                    raise BadRequestException("Key '%s' is empty." % key)
         else:
             if key not in event.keys():
                 raise BadRequestException("Key '%s' is missing." % key)
