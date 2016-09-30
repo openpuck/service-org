@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Test Vars
 TEST_CONFERENCE_ABBR="FOOBAR"
 TEST_CONFERENCE_IS_WOMEN="yes"
@@ -18,6 +20,11 @@ URL="https://mkvusbh1l7.execute-api.us-east-1.amazonaws.com/dev"
 CURL="curl -s ${DEBUG_OPTS} -H 'Content-Type: application/json'"
 
 # Functions
+echoerr() {
+    # Echo something to stderr
+    >&2 echo $1 $2
+}
+
 perform_call() {
     # Make a curl call for our testing
 
@@ -29,7 +36,8 @@ perform_call() {
     local NO_PRETTY=$5
 
     # Generate and run the call.
-    command_string="${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d '${PAYLOAD}'"
+    command_string="${CURL} -X ${METHOD} \"${URL}${ENDPOINT}\" -d '${PAYLOAD}'"
+    echoerr "Command String:" "${command_string}"
     data=$(eval ${command_string})
 
     # Return the output.
@@ -55,13 +63,17 @@ get_league_id() {
     # with it in other functions.
     local endpoint="/league?abbr=${TEST_LEAGUE_ABBR}"
     local league=$(perform_call "GET" ${URL} ${endpoint} "")
-    echo ${league} | jq -r '.id'
+    local league_id=$(echo ${league} | jq -r '.id')
+    echoerr "League ID:" "${league_id}"
+    echo ${league_id}
 }
 
 get_conference_id() {
     # Return the id of our test conference from the API so we can do easy lookups
     # with it in other functions.
-    local endpoint="/conference?league_abbr=${TEST_LEAGUE_ABBR}\&conf_abbr=${TEST_CONFERENCE_ABBR}\&is_women=${TEST_CONFERENCE_IS_WOMEN}"
-    local league=$(perform_call "GET" ${URL} ${endpoint} "")
-    echo ${league} | jq -r '.id'
+    local endpoint="/conference?league_abbr=${TEST_LEAGUE_ABBR}&conf_abbr=${TEST_CONFERENCE_ABBR}&is_women=${TEST_CONFERENCE_IS_WOMEN}"
+    local conference=$(perform_call "GET" ${URL} ${endpoint} "")
+    local conference_id=$(echo ${conference} | jq -r '.id')
+    echoerr "Conference ID:" "${conference_id}"
+    echo ${conference_id}
 }
