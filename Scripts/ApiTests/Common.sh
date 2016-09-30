@@ -86,5 +86,7 @@ get_season_id() {
     # Return the id of our test season.
     local endpoint="/season?league=$(get_league_id)&start_year=${TEST_SEASON_START_YEAR}&is_women=${TEST_SEASON_IS_WOMEN}"
     local season=$(perform_call "GET" ${URL} ${endpoint} "")
-
+    local season_id=$(echo ${season} | jq -r '.id')
+    echoerr "Season ID:" "${season_id}"
+    echo ${season_id}
 }
