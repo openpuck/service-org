@@ -91,3 +91,24 @@ get_season_id() {
     echoerr "Season ID:" "${season_id}"
     echo ${season_id}
 }
+
+get_institution_id() {
+    # Return the id of our test institution.
+    local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
+    local institution=$(perform_call "GET" ${URL} ${endpoint} "")
+    local institution_id=$(echo ${institution} | jq -r '.[].id')
+    echoerr "Institution ID:" "${institution_id}"
+    echo ${institution_id}
+}
+
+urlencode() {
+    # Return an urlencoded version of a string.
+    local inputstring=$1
+
+    echoerr "Input String: ${inputstring}"
+
+    # Thanks internet! http://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
+#    local PAYLOAD=$(echo ${output} | perl -pe "s|\"${SUB_ATTR}\": \"(.*?)\"|\"${SUB_ATTR}\": \"${SUB_VALUE}\"|")
+    local PAYLOAD=$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${inputstring}")
+    echo ${PAYLOAD}
+}

@@ -20,6 +20,23 @@ import lib
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
+    # return event
+
+    # Query
+    search_cn = event['cn']
+    if search_cn != "":
+        try:
+            entries = []
+            result = lib.InstitutionsTable.scan()
+            for result in result['Items']:
+                if result['cn'] == search_cn:
+                    entries.append(result)
+            if len(entries) >= 1:
+                return lib.get_json(entries)
+
+            raise lib.exceptions.NotFoundException("Institution '%s' not found." % search_cn)
+        except lib.exceptions.ClientError as ce:
+            raise lib.exceptions.InternalServerException(ce.message)
 
     # Return
     try:

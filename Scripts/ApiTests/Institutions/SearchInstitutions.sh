@@ -3,8 +3,9 @@
 # Load in our common stuff.
 source ../Common.sh
 
+
 # Test Endpoint and Method
-ENDPOINT="/institution?cn=${TEST_INSTITUTION_CN}"
+ENDPOINT="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
 METHOD="GET"
 PAYLOAD=''
 

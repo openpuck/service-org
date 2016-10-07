@@ -17,7 +17,7 @@
       "authorizationType": "none",
       "apiKeyRequired": false,
       "requestParameters": {},
-      "requestTemplates": "$${apiGatewayRequestTemplate}",
+      "requestTemplates": "$${apigInstitutionSearchRequestTemplate}",
       "responses": "$${apigResponsesTemplate}"
     }
   ],
