@@ -9,6 +9,7 @@ TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
 LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
 ConferencesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('conferences')
 SeasonsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('seasons')
+InstitutionsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('institutions')
 
 
 class DecimalEncoder(json.JSONEncoder):

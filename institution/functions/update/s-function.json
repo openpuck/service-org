@@ -1,0 +1,25 @@
+{
+  "name": "update",
+  "customName": false,
+  "customRole": false,
+  "handler": "functions/create/handler.handler",
+  "timeout": 3,
+  "memorySize": 128,
+  "custom": {
+    "excludePatterns": [],
+    "envVars": []
+  },
+  "endpoints": [
+    {
+      "path": "institution/{id}",
+      "method": "PUT",
+      "type": "AWS",
+      "authorizationType": "none",
+      "apiKeyRequired": false,
+      "requestParameters": {},
+      "requestTemplates": "$${apiGatewayRequestTemplate}",
+      "responses": "$${apigResponsesTemplate}"
+    }
+  ],
+  "events": []
+}
