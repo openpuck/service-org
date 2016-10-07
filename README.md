@@ -25,17 +25,19 @@ This service provides organizational information.
   * /{id} (GET, PUT, DELETE)
 * /season (GET, POST)
   * /{id} (GET, PUT, DELETE)
-
-TODO
 * /institution (GET, POST)
   * /{id} (GET, PUT, DELETE)
-    * /teams (GET)
-    * /leagues (GET)
+
+TODO
+
+* /institution/{id}/teams (GET)
+* /institution/{id}/leagues (GET)
+* /league/{id}/institutions (GET)
 
 ## Development Dependencies
 * NodeJS 4.X
 * Serverless 0.4.2
-* bash, curl, jq
+* bash, curl, jq, perl
 
 ## References
 Old scripts are at [the old repo](https://github.com/cohoe/OpenPuck/tree/45160b6e6987a6de2563b4bfd8b9e143553ea79c)
