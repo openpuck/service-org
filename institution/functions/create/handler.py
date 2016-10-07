@@ -26,7 +26,7 @@ def handler(event, context):
     event['body']['id'] = str(uuid4())
 
     # Test for required attributes
-    required_keys = ['cn']
+    required_keys = ['cn', 'city']
     lib.validation.check_keys(required_keys, event)
 
     # Validation

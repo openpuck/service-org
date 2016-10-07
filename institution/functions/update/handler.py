@@ -22,7 +22,7 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Test for required attributes
-    required_keys = ['id', 'name']
+    required_keys = ['id', 'cn', 'city']
     lib.validation.check_keys(required_keys, event)
 
     # Validation
@@ -36,9 +36,10 @@ def handler(event, context):
             Key={
                 'id': event['pathId']
             },
-            UpdateExpression="cn = :cn",
+            UpdateExpression="set cn = :cn, city = :city",
             ExpressionAttributeValues={
-                ':cn': event['body']['cn']
+                ':cn': event['body']['cn'],
+                ':city': event['body']['city']
             },
             ReturnValues="ALL_NEW"
         )
