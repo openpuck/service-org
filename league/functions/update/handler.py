@@ -22,7 +22,7 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Test for required attributes
-    required_keys = ['abbr', 'cn', 'website']
+    required_keys = ['id', 'abbr', 'cn', 'website']
     lib.validation.check_keys(required_keys, event)
     lib.validation.check_keys(['pathId'], event, False)
 
