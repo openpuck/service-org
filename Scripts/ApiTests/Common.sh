@@ -68,8 +68,11 @@ get_test_league_id() {
 #    echoerr "BEGIN get-league_id"
     local endpoint="/league?abbr=${TEST_LEAGUE_ABBR}"
     local league=$(perform_call "GET" ${URL} ${endpoint} "")
-    local league_id=$(echo ${league} | jq -r '.id')
-#    echoerr "League ID:" "${league_id}"
+    local league_id=$(echo ${league} | jq -r '.[].id')
+
+    if [[ ${DEBUG} == 1 ]]; then
+        echoerr "League ID:" "${league_id}"
+    fi
     echo ${league_id}
 #    echoerr "END get-league_id"
 }
@@ -80,16 +83,22 @@ get_test_conference_id() {
     local endpoint="/conference?league_abbr=${TEST_LEAGUE_ABBR}&conf_abbr=${TEST_CONFERENCE_ABBR}&is_women=${TEST_CONFERENCE_IS_WOMEN}"
     local conference=$(perform_call "GET" ${URL} ${endpoint} "")
     local conference_id=$(echo ${conference} | jq -r '.id')
-    echoerr "Conference ID:" "${conference_id}"
+
+    if [[ ${DEBUG} == 1 ]]; then
+        echoerr "Conference ID:" "${conference_id}"
+    fi
     echo ${conference_id}
 }
 
 get_test_season_id() {
     # Return the id of our test season.
-    local endpoint="/season?league=$(get_league_id)&start_year=${TEST_SEASON_START_YEAR}&is_women=${TEST_SEASON_IS_WOMEN}"
+    local endpoint="/season?league=$(get_test_league_id)&start_year=${TEST_SEASON_START_YEAR}&is_women=${TEST_SEASON_IS_WOMEN}"
     local season=$(perform_call "GET" ${URL} ${endpoint} "")
-    local season_id=$(echo ${season} | jq -r '.id')
-    echoerr "Season ID:" "${season_id}"
+    local season_id=$(echo ${season} | jq -r '.[].id')
+
+    if [[ ${DEBUG} == 1 ]]; then
+        echoerr "Season ID:" "${season_id}"
+    fi
     echo ${season_id}
 }
 
@@ -98,13 +107,16 @@ get_test_institution_id() {
     local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
     local institution=$(perform_call "GET" ${URL} ${endpoint} "")
     local institution_id=$(echo ${institution} | jq -r '.[].id')
-    echoerr "Institution ID:" "${institution_id}"
+
+    if [[ ${DEBUG} == 1 ]]; then
+        echoerr "Institution ID:" "${institution_id}"
+    fi
     echo ${institution_id}
 }
 
 get_test_team_id() {
     # Return the id of our test team.
-    local endpoint="/team?institution=$(get_institution_id)&is_women=${TEST_TEAM_IS_WOMEN}"
+    local endpoint="/team?institution=$(get_test_institution_id)&is_women=${TEST_TEAM_IS_WOMEN}"
     local team=$(perform_call "GET" ${URL} ${endpoint} "")
     local team_id=$(echo ${team} | jq -r '.[].id')
 

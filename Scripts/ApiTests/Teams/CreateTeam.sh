@@ -11,11 +11,11 @@ METHOD="POST"
 read -d '' PAYLOAD << EndOfPayload
 {
 "nickname": "Centurions",
-"institution": "05d7ab17-68e2-4cbe-ae3c-62bf908462bd",
+"institution": "$(get_test_institution_id)",
 "provider": "SidearmAdaptiveProvider",
 "is_women": "yes",
-"league": "ac99003b-845d-4cec-9c02-4dfe1acc1839",
-"conference": "f550d8ed-bc80-407a-be09-ee1b85ba3bca",
+"league": "$(get_test_league_id)",
+"conference": "$(get_test_conference_id)",
 "is_active": "yes",
 "website": "http://foo"
 }
