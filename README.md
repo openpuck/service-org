@@ -18,8 +18,7 @@ This service provides organizational information.
   * /?abbr=LEAGUE_ABBREVIATION
 * /conference (GET, POST)
   * /{id} (GET, PUT, DELETE)
-    * /teams (GET, POST)
-      * /teams/{id} (GET, DELETE)
+    * /teams (GET)
   * /?league_abbr=LEAGUE_ABBREVIATION&conf_abbr=CONFERENCE_ABBREVIATION&is_women=YES_OR_NO
 * /team (GET, POST)
   * /{id} (GET, PUT, DELETE)
@@ -29,7 +28,12 @@ This service provides organizational information.
   * /{id} (GET, PUT, DELETE)
 
 TODO
-
+* /league/{id}/conferences (POST)
+* /league/{id}/conferences/{id} (DELETE)
+* /league/{id}/seasons (POST)
+* /league/{id}/seasons/{id} (DELETE)
+* /conference/{id}/teams (POST)
+* /conference/{id}/teams/{id} (DELETE)
 * /institution/{id}/teams (GET)
 * /institution/{id}/leagues (GET)
 * /league/{id}/institutions (GET)

@@ -12,14 +12,15 @@ from Connection import clear_table
 table_name = "teams"
 clear_table(conn, table_name)
 
-# AbbrIndex = GlobalAllIndex("AbbrIndex",
-#                            parts=[
-#                                HashKey("abbr")
-#                            ],
-#                            throughput={
-#                                'read': 1,
-#                                'write': 1,
-#                            })
+TeamsByInstitutionGender = GlobalAllIndex("TeamsByInstitutionGender",
+                           parts=[
+                               HashKey("institution"),
+                               RangeKey("is_women")
+                           ],
+                           throughput={
+                               'read': 1,
+                               'write': 1,
+                           })
 
 new_table = Table.create(table_name,
                          schema=[
@@ -30,7 +31,7 @@ new_table = Table.create(table_name,
                              'write': 1
                          },
                          global_indexes=[
-                             # AbbrIndex,
+                             TeamsByInstitutionGender,
                          ],
                          connection=conn)
 
