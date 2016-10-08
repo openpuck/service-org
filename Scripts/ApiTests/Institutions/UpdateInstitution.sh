@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test-specific vars
-ENDPOINT="/institution/$(get_institution_id)"
+ENDPOINT="/institution/$(get_test_institution_id)"
 METHOD="PUT"
 SUB_ATTR="city"
 SUB_VALUE=$(date)

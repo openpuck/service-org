@@ -11,7 +11,7 @@ METHOD="POST"
 read -d '' PAYLOAD << EndOfPayload
 {
 "is_women": "yes",
-"league": "$(get_league_id)",
+"league": "$(get_test_league_id)",
 "start_year": ${TEST_SEASON_START_YEAR},
 "end_year": $((${TEST_SEASON_START_YEAR}+1))
 }

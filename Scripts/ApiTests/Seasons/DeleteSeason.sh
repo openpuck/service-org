@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test Endpoint and Method
-ENDPOINT="/season/$(get_season_id)"
+ENDPOINT="/season/$(get_test_season_id)"
 METHOD="DELETE"
 PAYLOAD=''
 

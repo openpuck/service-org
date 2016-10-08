@@ -14,7 +14,7 @@ read -d '' PAYLOAD << EndOfPayload
 "cn": "Test Conference",
 "website": "lolz",
 "is_women": "yes",
-"league": "$(get_league_id)"
+"league": "$(get_test_league_id)"
 }
 EndOfPayload
 

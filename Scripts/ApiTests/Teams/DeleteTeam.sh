@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test Endpoint and Method
-ENDPOINT="/team/$(get_team_id)"
+ENDPOINT="/team/$(get_test_team_id)"
 METHOD="DELETE"
 PAYLOAD=''
 

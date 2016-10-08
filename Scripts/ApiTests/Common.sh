@@ -62,7 +62,7 @@ sub_payload() {
     local PAYLOAD=$(echo ${output} | perl -pe "s|\"${SUB_ATTR}\": \"(.*?)\"|\"${SUB_ATTR}\": \"${SUB_VALUE}\"|")
     echo ${PAYLOAD}
 }
-get_league_id() {
+get_test_league_id() {
     # Return the id of our test league from the API so we can do easy lookups
     # with it in other functions.
 #    echoerr "BEGIN get-league_id"
@@ -74,7 +74,7 @@ get_league_id() {
 #    echoerr "END get-league_id"
 }
 
-get_conference_id() {
+get_test_conference_id() {
     # Return the id of our test conference from the API so we can do easy lookups
     # with it in other functions.
     local endpoint="/conference?league_abbr=${TEST_LEAGUE_ABBR}&conf_abbr=${TEST_CONFERENCE_ABBR}&is_women=${TEST_CONFERENCE_IS_WOMEN}"
@@ -84,7 +84,7 @@ get_conference_id() {
     echo ${conference_id}
 }
 
-get_season_id() {
+get_test_season_id() {
     # Return the id of our test season.
     local endpoint="/season?league=$(get_league_id)&start_year=${TEST_SEASON_START_YEAR}&is_women=${TEST_SEASON_IS_WOMEN}"
     local season=$(perform_call "GET" ${URL} ${endpoint} "")
@@ -93,7 +93,7 @@ get_season_id() {
     echo ${season_id}
 }
 
-get_institution_id() {
+get_test_institution_id() {
     # Return the id of our test institution.
     local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
     local institution=$(perform_call "GET" ${URL} ${endpoint} "")
@@ -102,7 +102,7 @@ get_institution_id() {
     echo ${institution_id}
 }
 
-get_team_id() {
+get_test_team_id() {
     # Return the id of our test team.
     local endpoint="/team?institution=$(get_institution_id)&is_women=${TEST_TEAM_IS_WOMEN}"
     local team=$(perform_call "GET" ${URL} ${endpoint} "")

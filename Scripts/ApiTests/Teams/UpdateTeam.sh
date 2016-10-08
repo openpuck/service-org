@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test-specific vars
-ENDPOINT="/team/$(get_team_id)"
+ENDPOINT="/team/$(get_test_team_id)"
 METHOD="PUT"
 SUB_ATTR="nickname"
 SUB_VALUE=$(date)

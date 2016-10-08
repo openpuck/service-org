@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test-specific vars
-ENDPOINT="/conference/$(get_conference_id)"
+ENDPOINT="/conference/$(get_test_conference_id)"
 METHOD="PUT"
 SUB_ATTR="abbr"
 SUB_VALUE="LOL WHO CARES"

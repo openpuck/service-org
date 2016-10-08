@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test Endpoint and Method
-ENDPOINT="/conference/$(get_conference_id)"
+ENDPOINT="/conference/$(get_test_conference_id)"
 METHOD="GET"
 PAYLOAD=''
 

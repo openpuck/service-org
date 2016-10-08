@@ -4,7 +4,7 @@
 source ../Common.sh
 
 # Test-specific vars
-ENDPOINT="/season/$(get_season_id)"
+ENDPOINT="/season/$(get_test_season_id)"
 METHOD="PUT"
 SUB_ATTR="end_year"
 SUB_VALUE=2020
