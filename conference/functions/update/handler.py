@@ -39,23 +39,8 @@ def handler(event, context):
                                    keys, event['pathId'])
 
     # Update
-    try:
-        response = lib.ConferencesTable.update_item(
-            Key={
-                'id': event['pathId']
-            },
-            UpdateExpression="set abbr = :abbr, cn = :cn, website = :website, is_women = :is_women, league = :league",
-            ExpressionAttributeValues={
-                ':abbr': event['body']['abbr'],
-                ':cn': event['body']['cn'],
-                ':website': event['body']['website'],
-                ':is_women': event['body']['is_women'],
-                ':league': event['body']['league']
-            },
-            ReturnValues="ALL_NEW"
-        )
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    response = lib.perform_update(table=lib.ConferencesTable, event=event,
+                                  keys=required_keys)
 
     # Return
-    return lib.get_json(response['Attributes'])
+    return lib.get_json(response)

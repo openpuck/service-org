@@ -31,20 +31,8 @@ def handler(event, context):
     # Relations
 
     # Update
-    try:
-        response = lib.InstitutionsTable.update_item(
-            Key={
-                'id': event['pathId']
-            },
-            UpdateExpression="set cn = :cn, city = :city",
-            ExpressionAttributeValues={
-                ':cn': event['body']['cn'],
-                ':city': event['body']['city']
-            },
-            ReturnValues="ALL_NEW"
-        )
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    response = lib.perform_update(table=lib.InstitutionsTable, event=event,
+                                  keys=required_keys)
 
     # Return
-    return lib.get_json(response['Attributes'])
+    return lib.get_json(response)

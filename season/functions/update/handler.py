@@ -33,22 +33,8 @@ def handler(event, context):
     lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
 
     # Update
-    try:
-        response = lib.SeasonsTable.update_item(
-            Key={
-                'id': event['pathId']
-            },
-            UpdateExpression="set is_women = :is_women, league = :league, start_year = :start_year, end_year = :end_year",
-            ExpressionAttributeValues={
-                ':start_year': event['body']['start_year'],
-                ':end_year': event['body']['end_year'],
-                ':is_women': event['body']['is_women'],
-                ':league': event['body']['league'],
-            },
-            ReturnValues="ALL_NEW"
-        )
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    response = lib.perform_update(table=lib.SeasonsTable, event=event,
+                                  keys=required_keys)
 
     # Return
-    return lib.get_json(response['Attributes'])
+    return lib.get_json(response)

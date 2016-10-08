@@ -16,7 +16,6 @@ sys.path.append(os.path.join(here, "../../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
-from uuid import uuid4
 
 
 def handler(event, context):
@@ -28,21 +27,8 @@ def handler(event, context):
     lib.validation.check_keys(['pathId'], event, False)
 
     # Update
-    try:
-        response = lib.LeaguesTable.update_item(
-            Key={
-                'id': event['pathId']
-            },
-            UpdateExpression="set abbr = :abbr, cn = :cn, website = :website",
-            ExpressionAttributeValues={
-                ':abbr': event['body']['abbr'],
-                ':cn': event['body']['cn'],
-                ':website': event['body']['website']
-            },
-            ReturnValues="ALL_NEW"
-        )
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    response = lib.perform_update(table=lib.LeaguesTable, event=event,
+                                  keys=required_keys)
 
     # Return
-    return lib.get_json(response['Attributes'])
+    return lib.get_json(response)
