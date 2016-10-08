@@ -15,6 +15,7 @@ This service provides organizational information.
   * /{id} (GET, PUT, DELETE)
     * /conferences (GET)
     * /seasons (GET)
+    * /institutions (GET)
   * /?abbr=LEAGUE_ABBREVIATION
 * /conference (GET, POST)
   * /{id} (GET, PUT, DELETE)
@@ -30,7 +31,7 @@ This service provides organizational information.
     * /leagues (GET)
 
 TODO
-* /league/{id}/institutions (GET)
+* Docs for query
 
 ## Development Dependencies
 * NodeJS 4.X

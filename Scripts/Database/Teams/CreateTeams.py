@@ -21,6 +21,15 @@ TeamsByInstitutionGender = GlobalAllIndex("TeamsByInstitutionGender",
                                'read': 1,
                                'write': 1,
                            })
+TeamsByLeagueGender = GlobalAllIndex("TeamsByLeagueGender",
+                                          parts=[
+                                              HashKey("league"),
+                                              RangeKey("is_women")
+                                          ],
+                                          throughput={
+                                              'read': 1,
+                                              'write': 1,
+                                          })
 
 new_table = Table.create(table_name,
                          schema=[
@@ -32,6 +41,7 @@ new_table = Table.create(table_name,
                          },
                          global_indexes=[
                              TeamsByInstitutionGender,
+                             TeamsByLeagueGender
                          ],
                          connection=conn)
 

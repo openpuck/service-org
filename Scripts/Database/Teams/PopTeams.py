@@ -36,7 +36,7 @@ Teams.put_item(data={
 Teams.put_item(data={
     'id': '3fe7bfbd-dfc2-47f8-940b-e7853fdf9550',
     'nickname': 'Huskies',
-    'institution': 'LOLZNOPE',
+    'institution': '65058917-6137-4d0e-9cd2-c35ec55b2f1d',
     'provider': 'SidearmAdaptiveProvider',
     'is_women': 'yes',
     'league': 'ac99003b-845d-4cec-9c02-4dfe1acc1839',
