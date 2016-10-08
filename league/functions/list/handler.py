@@ -33,9 +33,7 @@ def handler(event, context):
             if result['Count'] is 0:
                 raise lib.exceptions.NotFoundException(
                     "Abbreviated league '%s' not found." % search_abbr)
-            # This will only return the first result. Pretty sure leagues
-            # wont be duplicated.
-            return lib.get_json(result['Items'][0])
+            return lib.get_json(result['Items'])
         except lib.exceptions.ClientError as ce:
             raise lib.exceptions.InternalServerException(ce.message)
 

@@ -47,9 +47,12 @@ def handler(event, context):
                     IndexName='ConfByLeagueGender',
                     KeyConditionExpression=Key('league').eq(league['id'])
                 )
+                entries = []
                 for conf in conf_result['Items']:
                     if conf['abbr'] == conf_abbr and conf['is_women'] == is_women:
-                        return lib.get_json(conf)
+                        entries.append(conf)
+                if len(entries) >= 1:
+                    return lib.get_json(conf)
                 raise lib.exceptions.NotFoundException("Conference '%s' not found for league '%s' with is_women='%s'." % (conf_abbr, league_abbr, is_women))
             # return lib.get_json(league_result['Items'])
     except lib.exceptions.ClientError as ce:

@@ -24,23 +24,6 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Query
-    # search_abbr = event['abbr']
-    # if search_abbr != "":
-    #     try:
-    #         result = lib.LeaguesTable.query(
-    #             IndexName='AbbrIndex',
-    #             KeyConditionExpression=Key('abbr').eq(search_abbr)
-    #         )
-    #         if result['Count'] is 0:
-    #             raise lib.exceptions.NotFoundException(
-    #                 "Abbreviated league '%s' not found." % search_abbr)
-    #         # This will only return the first result. Pretty sure leagues
-    #         # wont be duplicated.
-    #         return lib.get_json(result['Items'][0])
-    #     except lib.exceptions.ClientError as ce:
-    #         raise lib.exceptions.InternalServerException(ce.message)
-
-    # Query
     league_id = event['league']
     start_year = event['start_year']
     is_women = event['is_women']
@@ -50,17 +33,18 @@ def handler(event, context):
         if league_id == "" or start_year == "":
             return lib.get_json(lib.SeasonsTable.scan()['Items'])
         else:
-            # league_response = lib.LeaguesTable.get_item(Key={'id': league_id})
-
             # Now find the conference.
             # for league in league_result['Items']:
             season_result = lib.SeasonsTable.query(
                 IndexName='SeasonByLeagueStart',
                 KeyConditionExpression=Key('league').eq(league_id) & Key('start_year').eq(decimal.Decimal(start_year))
             )
+            return_results = []
             for season in season_result['Items']:
                 if season['is_women'] == is_women:
-                    return lib.get_json(season)
+                    return_results.append(season)
+            if return_results is not []:
+                return lib.get_json(return_results)
             raise lib.exceptions.NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
     except lib.exceptions.ClientError as ce:
         raise lib.exceptions.InternalServerException(ce.message)
