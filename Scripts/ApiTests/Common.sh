@@ -104,15 +104,12 @@ get_institution_id() {
 
 get_team_id() {
     # Return the id of our test team.
-    local institution_id=$(get_institution_id)
-    local endpoint="/institution/${institution_id}/teams"
+    local endpoint="/team?institution=$(get_institution_id)&is_women=${TEST_TEAM_IS_WOMEN}"
+    local team=$(perform_call "GET" ${URL} ${endpoint} "")
+    local team_id=$(echo ${team} | jq -r '.[].id')
 
-
-#    local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
-#    local institution=$(perform_call "GET" ${URL} ${endpoint} "")
-#    local institution_id=$(echo ${institution} | jq -r '.[].id')
-#    echoerr "Institution ID:" "${institution_id}"
-#    echo ${institution_id}
+    echoerr "Team ID:" "${team_id}"
+    echo "${team_id}"
 }
 
 urlencode() {

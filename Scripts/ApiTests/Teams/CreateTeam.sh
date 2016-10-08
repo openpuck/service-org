@@ -3,21 +3,22 @@
 # Load in our common stuff.
 source ../Common.sh
 
-# Test-specific vars
-
+# Test Endpoint and Method
+ENDPOINT="/team"
 METHOD="POST"
-PAYLOAD='{
+
+# Payload
+read -d '' PAYLOAD << EndOfPayload
+{
 "nickname": "Centurions",
-"institution": "Cylons",
+"institution": "05d7ab17-68e2-4cbe-ae3c-62bf908462bd",
 "provider": "SidearmAdaptiveProvider",
 "is_women": "yes",
 "league": "ac99003b-845d-4cec-9c02-4dfe1acc1839",
 "conference": "f550d8ed-bc80-407a-be09-ee1b85ba3bca",
 "is_active": "yes",
 "website": "http://foo"
-}'
-ENDPOINT="/team"
+}
+EndOfPayload
 
-# Execute
-#echo "${URL}/${ENDPOINT}"
-eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp
+perform_call ${METHOD} ${URL} ${ENDPOINT} "${PAYLOAD}"

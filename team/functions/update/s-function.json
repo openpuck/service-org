@@ -2,7 +2,7 @@
   "name": "update",
   "customName": false,
   "customRole": false,
-  "handler": "functions/create/handler.handler",
+  "handler": "functions/update/handler.handler",
   "timeout": 3,
   "memorySize": 128,
   "custom": {

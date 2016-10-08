@@ -3,11 +3,9 @@
 # Load in our common stuff.
 source ../Common.sh
 
-# Test-specific vars
+# Test Endpoint and Method
+ENDPOINT="/team/$(get_team_id)"
 METHOD="DELETE"
 PAYLOAD=''
-ENDPOINT="/team/39162250-c85b-438d-a6ac-79e110f11c22"
 
-# Execute
-#echo "${URL}/${ENDPOINT}"
-eval ${CURL} -X ${METHOD} ${URL}${ENDPOINT} -d \'${PAYLOAD}\' | json_pp
+perform_call ${METHOD} ${URL} ${ENDPOINT} "${PAYLOAD}"
