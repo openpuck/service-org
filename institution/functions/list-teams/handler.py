@@ -22,10 +22,7 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Test for required attributes
-    if 'pathId' not in event:
-        raise lib.exceptions.BadRequestException("Key 'id' is missing.")
-    if event['pathId'] == "":
-        raise lib.exceptions.BadRequestException("Key 'id' is missing.")
+    lib.validation.check_keys(['pathId'], event, False)
 
     try:
         result = lib.TeamsTable.query(
