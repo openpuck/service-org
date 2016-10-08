@@ -8,7 +8,8 @@ TEST_CONFERENCE_IS_WOMEN="yes"
 TEST_LEAGUE_ABBR="NCAA"
 TEST_SEASON_START_YEAR=2015
 TEST_SEASON_IS_WOMEN="yes"
-TEST_INSTITUTION_CN="FOOBAR INSTITUTE OF TECHNOLOGY"
+TEST_INSTITUTION_CN="Rochester Institute of Technology"
+TEST_TEAM_IS_WOMEN="yes"
 
 # Environment
 DEBUG=0
@@ -101,14 +102,24 @@ get_institution_id() {
     echo ${institution_id}
 }
 
+get_team_id() {
+    # Return the id of our test team.
+    local institution_id=$(get_institution_id)
+    local endpoint="/institution/${institution_id}/teams"
+
+
+#    local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
+#    local institution=$(perform_call "GET" ${URL} ${endpoint} "")
+#    local institution_id=$(echo ${institution} | jq -r '.[].id')
+#    echoerr "Institution ID:" "${institution_id}"
+#    echo ${institution_id}
+}
+
 urlencode() {
     # Return an urlencoded version of a string.
     local inputstring=$1
-
-    echoerr "Input String: ${inputstring}"
-
+#    echoerr "Input String: ${inputstring}"
     # Thanks internet! http://stackoverflow.com/questions/296536/how-to-urlencode-data-for-curl-command
-#    local PAYLOAD=$(echo ${output} | perl -pe "s|\"${SUB_ATTR}\": \"(.*?)\"|\"${SUB_ATTR}\": \"${SUB_VALUE}\"|")
     local PAYLOAD=$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${inputstring}")
     echo ${PAYLOAD}
 }

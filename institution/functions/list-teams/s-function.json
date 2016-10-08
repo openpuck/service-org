@@ -1,5 +1,5 @@
 {
-  "name": "list",
+  "name": "list-teams",
   "customName": false,
   "customRole": false,
   "handler": "functions/list-teams/handler.handler",

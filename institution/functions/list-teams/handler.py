@@ -27,11 +27,10 @@ def handler(event, context):
     if event['pathId'] == "":
         raise lib.exceptions.BadRequestException("Key 'id' is missing.")
 
-
     try:
         result = lib.TeamsTable.query(
-            IndexName='ConfByLeagueGender',
-            KeyConditionExpression=Key('league').eq(event['pathId'])
+            IndexName='TeamsByInstitutionGender',
+            KeyConditionExpression=Key('institution').eq(event['pathId'])
         )
         return lib.get_json(result['Items'])
     except lib.exceptions.ClientError as ce:

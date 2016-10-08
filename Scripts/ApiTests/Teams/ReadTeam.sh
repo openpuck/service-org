@@ -6,7 +6,7 @@ source ../Common.sh
 # Test-specific vars
 METHOD="GET"
 PAYLOAD=''
-ENDPOINT="/team/39162250-c85b-438d-a6ac-79e110f11c22"
+ENDPOINT="/team/$(get_team_id)"
 
 # Execute
 #echo "${URL}/${ENDPOINT}"
