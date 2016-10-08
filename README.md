@@ -26,16 +26,10 @@ This service provides organizational information.
   * /{id} (GET, PUT, DELETE)
 * /institution (GET, POST)
   * /{id} (GET, PUT, DELETE)
+    * /teams (GET)
+    * /leagues (GET)
 
 TODO
-* /league/{id}/conferences (POST)
-* /league/{id}/conferences/{id} (DELETE)
-* /league/{id}/seasons (POST)
-* /league/{id}/seasons/{id} (DELETE)
-* /conference/{id}/teams (POST)
-* /conference/{id}/teams/{id} (DELETE)
-* /institution/{id}/teams (GET)
-* /institution/{id}/leagues (GET)
 * /league/{id}/institutions (GET)
 
 ## Development Dependencies
