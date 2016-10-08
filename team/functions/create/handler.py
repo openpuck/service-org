@@ -46,10 +46,7 @@ def handler(event, context):
                                        event['body']['league'])
 
     # Add to database
-    try:
-        lib.TeamsTable.put_item(Item=event['body'])
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    lib.perform_create(lib.TeamsTable, event)
 
     # Return
     return event['body']

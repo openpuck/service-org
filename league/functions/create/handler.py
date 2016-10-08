@@ -30,10 +30,7 @@ def handler(event, context):
     lib.validation.check_keys(required_keys, event)
 
     # Add to database
-    try:
-        lib.LeaguesTable.put_item(Item=event['body'])
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    lib.perform_create(lib.LeaguesTable, event)
 
     # Return
     return event['body']

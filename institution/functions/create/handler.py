@@ -35,10 +35,7 @@ def handler(event, context):
     # Relations
 
     # Add to database
-    try:
-        lib.InstitutionsTable.put_item(Item=event['body'])
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    lib.perform_create(lib.InstitutionsTable, event)
 
     # Return
     return event['body']

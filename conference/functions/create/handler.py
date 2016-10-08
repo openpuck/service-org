@@ -43,10 +43,7 @@ def handler(event, context):
     lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
 
     # Add to database
-    try:
-        lib.ConferencesTable.put_item(Item=event['body'])
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    lib.perform_create(lib.ConferencesTable, event)
 
     # Return
     return event['body']

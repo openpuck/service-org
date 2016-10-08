@@ -74,6 +74,14 @@ def create_expression_attribute_values(keys, event, body=True):
 
 
 def perform_update(table, event, keys, drop_id=True):
+    """
+    Perform an update to a table element.
+    :param table: The Table to work on.
+    :param event: The Event containing the new values.
+    :param keys: List of keys to update.
+    :param drop_id: Drop the ID field from keys
+    :return: The attributes of the new object if success, Exception if not.
+    """
     # Remove the ID key since we don't let users change that.
     if drop_id is True:
         keys.remove('id')
@@ -89,5 +97,18 @@ def perform_update(table, event, keys, drop_id=True):
         )
 
         return response['Attributes']
+    except exceptions.ClientError as ce:
+        raise exceptions.InternalServerException(ce.message)
+
+
+def perform_create(table, event):
+    """
+    Create a new object in a table.
+    :param table: The Table object to operate on.
+    :param event: The event containing the object we want to insert.
+    :return: The event body if success, Exception if failed.
+    """
+    try:
+        table.put_item(Item=event['body'])
     except exceptions.ClientError as ce:
         raise exceptions.InternalServerException(ce.message)
