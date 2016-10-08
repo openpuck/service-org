@@ -6,8 +6,8 @@ source ../Common.sh
 # Test-specific vars
 ENDPOINT="/conference/$(get_conference_id)"
 METHOD="PUT"
-SUB_ATTR="cn"
-SUB_VALUE=$(date)
+SUB_ATTR="abbr"
+SUB_VALUE="LOL WHO CARES"
 
 # Cook up the new object
 output=$(perform_call "GET" ${URL} ${ENDPOINT} "" true)

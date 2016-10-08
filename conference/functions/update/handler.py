@@ -30,6 +30,14 @@ def handler(event, context):
     lib.validation.check_relation(lib.LeaguesTable, 'id',
                                   event['body']['league'])
 
+    # Duplicates
+    keys = {
+        'abbr': event['body']['abbr'],
+        'is_women': event['body']['is_women']
+    }
+    lib.validation.check_duplicate(lib.ConferencesTable, 'ConfByAbbrGender',
+                                   keys, event['pathId'])
+
     # Update
     try:
         response = lib.ConferencesTable.update_item(

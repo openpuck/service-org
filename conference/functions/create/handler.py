@@ -31,6 +31,15 @@ def handler(event, context):
 
     # Validation
     lib.validation.check_boolean(event, ['is_women'])
+
+    # Duplicates
+    keys = {
+        'abbr': event['body']['abbr'],
+        'is_women': event['body']['is_women']
+    }
+    lib.validation.check_duplicate(lib.ConferencesTable, 'ConfByAbbrGender', keys)
+
+    # Relations
     lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
 
     # Add to database

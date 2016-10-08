@@ -19,3 +19,7 @@ for entry in Conferences.query(index='ConfByLeagueGender', league__eq="ac99003b-
 print "ConfByLeagueGender Query (league+gender)"
 for entry in Conferences.query(index='ConfByLeagueGender', league__eq="ac99003b-845d-4cec-9c02-4dfe1acc1839", is_women__eq="yes"):
     print dict(entry)
+
+print "ConfAbbrIndex Query"
+for entry in Conferences.query(index='ConfByAbbrGender', abbr__eq="WCHA", is_women__eq="yes"):
+    print dict(entry)

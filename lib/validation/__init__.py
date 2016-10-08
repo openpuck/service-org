@@ -1,6 +1,23 @@
 import re
 from lib.exceptions import *
 from decimal import Decimal, InvalidOperation
+from boto3.dynamodb.conditions import Key
+
+
+def build_key_expression_from_dict(data):
+    """
+    Build a KeyConditionExpression object from a dictionary of key:value pairs.
+    :param data: The dictionary of data.
+    :return: A KeyConditionExpression object
+    """
+    key_object = None
+    for key in data.keys():
+        if key_object is None:
+            key_object = Key(key).eq(data[key])
+        else:
+            key_object = key_object & Key(key).eq(data[key])
+
+    return key_object
 
 
 def string_length(input_string, num_chars):
@@ -147,3 +164,31 @@ def check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
                             "attribute '%s' (got '%s')" %
                             (foreign_table.table_name, foreign_key_attr,
                              foreign_key, foreign_attr, value))
+
+
+def check_duplicate(DynamoTable, table_index, keys, exclude_value=None, exclude_attr='id'):
+    """
+    Checks for a duplicate entry of the given keys in a given table using a
+    given index.
+    :param DynamoTable: The Table object to search.
+    :param table_index: The name of the index to search in.
+    :param keys: Dictionary of the keys needed for the index.
+    :param exclude_id: Optional id to exclude from duplicate detection (for updates)
+    :return: None if Good, Exception if Duplicate.
+    """
+
+    try:
+        results = DynamoTable.query(IndexName=table_index, KeyConditionExpression=build_key_expression_from_dict(keys))
+        # If there is one and only one result, and we were given an exclude id
+        # (likely for update) - See if it's the thing we're updating.
+        if len(results['Items']) == 1 and exclude_value is not None:
+            # The ID needs to match, else it's toast
+            if results['Items'][0][exclude_attr] == exclude_value:
+                return
+        # No results means no duplicates
+        if len(results['Items']) == 0:
+            return
+        # Whelp, you dun goofd Jon Snow
+        raise BadRequestException("Duplicate object (Keys:%s) found in table '%s'" % (keys, DynamoTable.table_name))
+    except ClientError as ce:
+        raise InternalServerException(ce.message)

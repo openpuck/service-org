@@ -23,14 +23,15 @@ ConfByLeagueGenderIndex = GlobalAllIndex("ConfByLeagueGender",
                                              'write': 1
                                          })
 
-# AbbrIndex = GlobalAllIndex("AbbrIndex",
-#                            parts=[
-#                                HashKey("abbr")
-#                            ],
-#                            throughput={
-#                                'read': 1,
-#                                'write': 1,
-#                            })
+ConfAbbrIndex = GlobalAllIndex("ConfByAbbrGender",
+                           parts=[
+                               HashKey("abbr"),
+                               RangeKey("is_women")
+                           ],
+                           throughput={
+                               'read': 1,
+                               'write': 1
+                           })
 
 new_table = Table.create(table_name,
                          schema=[
@@ -42,6 +43,7 @@ new_table = Table.create(table_name,
                          },
                          global_indexes=[
                              ConfByLeagueGenderIndex,
+                             ConfAbbrIndex
                          ],
                          connection=conn)
 
