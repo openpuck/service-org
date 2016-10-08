@@ -42,29 +42,8 @@ def handler(event, context):
                                        event['body']['league'])
 
     # Update
-    try:
-        response = lib.TeamsTable.update_item(
-            Key={
-                'id': event['pathId']
-            },
-            UpdateExpression="set nickname = :nickname, institution = :institution, "
-                             "provider = :provider, is_women = :is_women, "
-                             "league = :league, conference = :conference, "
-                             "is_active = :is_active, website = :website",
-            ExpressionAttributeValues={
-                ':nickname': event['body']['nickname'],
-                ':institution': event['body']['institution'],
-                ':provider': event['body']['provider'],
-                ':is_women': event['body']['is_women'],
-                ':league': event['body']['league'],
-                ':conference': event['body']['conference'],
-                ':is_active': event['body']['is_active'],
-                ':website': event['body']['website']
-            },
-            ReturnValues="ALL_NEW"
-        )
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    response = lib.perform_update(table=lib.TeamsTable, event=event,
+                                  keys=required_keys)
 
     # Return
-    return lib.get_json(response['Attributes'])
+    return lib.get_json(response)
