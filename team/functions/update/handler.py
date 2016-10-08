@@ -22,6 +22,8 @@ def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
     # Test for required attributes
+    lib.validation.check_keys(['pathId'], event, False)
+
     required_keys = ['id', 'nickname', 'institution', 'provider', 'is_women',
                      'league', 'conference', 'is_active', 'website']
     lib.validation.check_keys(required_keys, event)
