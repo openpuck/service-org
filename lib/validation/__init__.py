@@ -4,6 +4,12 @@ from decimal import Decimal, InvalidOperation
 from boto3.dynamodb.conditions import Key
 
 
+MODE_CREATE = "CREATE"
+MODE_READ = "READ"
+MODE_UPDATE = "UPDATE"
+MODE_DELETE = "DELETE"
+
+
 def build_key_expression_from_dict(data):
     """
     Build a KeyConditionExpression object from a dictionary of key:value pairs.

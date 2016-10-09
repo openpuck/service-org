@@ -16,26 +16,14 @@ sys.path.append(os.path.join(here, "../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
+import lib.teams as teams
 
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Tables
-    teams_table = lib.get_table(lib.TEAMS_TABLE)
-
-    # Validation
-    lib.validation.check_keys(['pathId'], event, False)
-
-    # Get response
-    try:
-        response = teams_table.get_item(Key={'id': event['pathId']})
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
-
-    if 'Item' not in response:
-        raise lib.exceptions.NotFoundException(
-            "Object '%s' not found." % event['pathId'])
+    teams.perform_input_tests(event, mode=lib.validation.MODE_READ)
+    response = teams.perform_read(event)
 
     # Return
-    return lib.get_json(response['Item'])
+    return lib.get_json(response)

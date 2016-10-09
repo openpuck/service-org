@@ -2,36 +2,54 @@
 import validation
 from uuid import uuid4
 from lib.tables import LeaguesTable, ConferencesTable, TeamsTable
-from lib import create_database_element, update_database_element
+from lib import create_database_element, update_database_element, read_database_element, delete_database_element
+from lib.exceptions import BadRequestException
+
 
 # These are the required attributes for this object.
 required_keys = ['nickname', 'institution', 'provider', 'is_women',
                  'league', 'conference', 'is_active', 'website']
 
 
-def perform_input_tests(event, update_mode=True):
+def perform_input_tests(event, mode):
     """
     Metafunction to run the standard set of tests against the given event.
     :param event: The event to test.
-    :param update_mode: Whether this is an Update (True) or Create (False).
+    :param mode: Determines which checks should be performed.
     :return: None if success, Exception if failed.
     """
-    test_keys(event, update_mode)
-    test_validation(event)
-    test_relations(event)
+    if mode == validation.MODE_CREATE or mode == validation.MODE_UPDATE:
+        test_keys(event, mode)
+        test_validation(event)
+        test_relations(event)
+    elif mode == validation.MODE_READ:
+        test_keys(event, mode)
+    elif mode == validation.MODE_DELETE:
+        # @TODO: Test for delete
+        pass
+    else:
+        # If we get here, something went very wrong.
+        raise BadRequestException("Invalid input test validation mode specified ('%s')." % mode)
 
 
-def test_keys(event, update_mode=True):
+def test_keys(event, mode):
     # @TODO: Move this to validation and make generic
     """
     Tests for the presence of required keys in the event.
     :param event: The event to test.
-    :param update_mode: Whether this is an Update (True) or Create (False)
+    :param mode: Determines which checks should be performed.
     :return: None if success, Exception if failed.
     """
-    if update_mode is True:
+    if mode == validation.MODE_CREATE:
+        validation.check_keys(required_keys, event)
+    elif mode == validation.MODE_READ or mode == validation.MODE_DELETE:
         validation.check_keys(['pathId'], event, False)
-    validation.check_keys(required_keys, event)
+    elif mode == validation.MODE_UPDATE:
+        validation.check_keys(['pathId'], event, False)
+        validation.check_keys(required_keys, event)
+    else:
+        # If we get here, something went very wrong.
+        raise BadRequestException("Invalid key validation mode specified ('%s')." % mode)
 
 
 def test_validation(event):
@@ -81,3 +99,21 @@ def perform_create(event):
     event['body']['id'] = str(uuid4())
 
     return create_database_element(TeamsTable, event)
+
+
+def perform_read(event):
+    """
+    Take the event and use it to read an existing object from the database.
+    :param event: The verified event.
+    :return: A JSON blob of the object.
+    """
+    return read_database_element(table=TeamsTable, event=event)
+
+
+def perform_delete(event):
+    """
+    Take the event and use it to delete an existing object from the database.
+    :param event: The verified event.
+    :return: A JSON blob of the object.
+    """
+    return delete_database_element(table=TeamsTable, event=event)

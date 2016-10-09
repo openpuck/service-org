@@ -4,6 +4,7 @@ import json
 import decimal
 import validation
 import exceptions
+from boto3.dynamodb.conditions import Attr
 
 # TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
 # LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
@@ -132,3 +133,42 @@ def create_database_element(table, event):
         raise exceptions.InternalServerException(ce.message)
 
     return event['body']
+
+
+def read_database_element(table, event):
+    """
+    Read an object from a table.
+    :param table: The Table object to operate on.
+    :param event: The event containing the object we want to read.
+    :return: The event body if success, Exception if failed.
+    """
+    try:
+        response = table.get_item(Key={'id': event['pathId']})
+    except exceptions.ClientError as ce:
+        raise exceptions.InternalServerException(ce.message)
+
+    if 'Item' not in response:
+        raise exceptions.NotFoundException("Object '%s' not found in table '%s'." % (event['pathId'], table.table_name))
+
+    return response['Item']
+
+
+def delete_database_element(table, event):
+    """
+    Delete an object from a table.
+    :param table: The Table object to operate on.
+    :param event: The event containing the object we want to delete.
+    :return: An empty JSON blob if True, Exception if failed.
+    """
+    try:
+        table.delete_item(
+            Key={'id': event['pathId']},
+            ConditionExpression=Attr('id').eq(event['pathId'])
+        )
+        return {}
+    except exceptions.ClientError as ce:
+        if "ConditionalCheckFailedException" in ce.message:
+            raise exceptions.NotFoundException(
+                "Object '%s' not found." % event['pathId'])
+
+        raise exceptions.InternalServerException(ce.message)
