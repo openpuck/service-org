@@ -21,12 +21,15 @@ import lib
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
+    # Tables
+    teams_table = lib.get_table(lib.TEAMS_TABLE)
+
     # Validation
     lib.validation.check_keys(['pathId'], event, False)
 
     # Get response
     try:
-        response = lib.TeamsTable.get_item(Key={'id': event['pathId']})
+        response = teams_table.get_item(Key={'id': event['pathId']})
     except lib.exceptions.ClientError as ce:
         raise lib.exceptions.InternalServerException(ce.message)
 

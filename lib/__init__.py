@@ -5,11 +5,26 @@ import decimal
 import validation
 import exceptions
 
-TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
-LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
-ConferencesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('conferences')
-SeasonsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('seasons')
-InstitutionsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('institutions')
+# TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
+# LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
+# ConferencesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('conferences')
+# SeasonsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('seasons')
+# InstitutionsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('institutions')
+
+TEAMS_TABLE = "teams"
+LEAGUES_TABLE = "leagues"
+CONFERENCES_TABLE = "conferences"
+SEASONS_TABLE = "seasons"
+INSTITUTIONS_TABLE = "institutions"
+
+
+def get_table(name):
+    """
+    Return a Table object for a given name.
+    :param name: The table name.
+    :return: A Boto3 Table object.
+    """
+    return boto3.resource('dynamodb', region_name='us-east-1').Table(name)
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -73,7 +88,7 @@ def create_expression_attribute_values(keys, event, body=True):
     return values
 
 
-def perform_update(table, event, keys, drop_id=True):
+def update_database_element(table, event, keys, drop_id=True):
     """
     Perform an update to a table element.
     :param table: The Table to work on.
@@ -84,7 +99,10 @@ def perform_update(table, event, keys, drop_id=True):
     """
     # Remove the ID key since we don't let users change that.
     if drop_id is True:
-        keys.remove('id')
+        try:
+            keys.remove('id')
+        except ValueError:
+            pass
 
     try:
         response = table.update_item(
@@ -101,7 +119,7 @@ def perform_update(table, event, keys, drop_id=True):
         raise exceptions.InternalServerException(ce.message)
 
 
-def perform_create(table, event):
+def create_database_element(table, event):
     """
     Create a new object in a table.
     :param table: The Table object to operate on.
@@ -112,3 +130,5 @@ def perform_create(table, event):
         table.put_item(Item=event['body'])
     except exceptions.ClientError as ce:
         raise exceptions.InternalServerException(ce.message)
+
+    return event['body']

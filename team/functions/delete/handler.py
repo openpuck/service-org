@@ -22,9 +22,12 @@ from boto3.dynamodb.conditions import Attr
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
+    # Tables
+    teams_table = lib.get_table(lib.TEAMS_TABLE)
+
     # Return
     try:
-        lib.TeamsTable.delete_item(
+        teams_table.delete_item(
                                Key={'id': event['pathId']},
                                ConditionExpression=Attr('id').eq(event['pathId'])
                            )

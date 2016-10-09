@@ -22,6 +22,9 @@ from boto3.dynamodb.conditions import Key
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
+    # Tables
+    teams_table = lib.get_table(lib.TEAMS_TABLE)
+
     # Query
     institution_id = event['institution']
     is_women = event['is_women']
@@ -29,9 +32,9 @@ def handler(event, context):
     try:
         # You have to use == or Python gets stupid.
         if institution_id == "" or is_women == "":
-            return lib.get_json(lib.TeamsTable.scan()['Items'])
+            return lib.get_json(teams_table.scan()['Items'])
         else:
-            team_results = lib.TeamsTable.query(
+            team_results = teams_table.query(
                 IndexName='TeamsByInstitutionGender',
                 KeyConditionExpression=Key('institution').eq(institution_id) & Key(
                     'is_women').eq(is_women)

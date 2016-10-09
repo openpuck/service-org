@@ -16,36 +16,14 @@ sys.path.append(os.path.join(here, "../../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
+import lib.teams as teams
 
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Test for required attributes
-    lib.validation.check_keys(['pathId'], event, False)
-
-    required_keys = ['id', 'nickname', 'institution', 'provider', 'is_women',
-                     'league', 'conference', 'is_active', 'website']
-    lib.validation.check_keys(required_keys, event)
-
-    # Validation
-    lib.validation.check_boolean(event, ['is_women', 'is_active'])
-
-    # Relations
-    lib.validation.check_relation(lib.LeaguesTable, 'id',
-                                  event['body']['league'])
-    lib.validation.check_relation(lib.ConferencesTable, 'id',
-                                  event['body']['conference'])
-    lib.validation.check_relation_attr(lib.ConferencesTable, 'id',
-                                       event['body']['conference'], 'is_women',
-                                       event['body']['is_women'])
-    lib.validation.check_relation_attr(lib.ConferencesTable, 'id',
-                                       event['body']['conference'], 'league',
-                                       event['body']['league'])
-
-    # Update
-    response = lib.perform_update(table=lib.TeamsTable, event=event,
-                                  keys=required_keys)
+    teams.perform_input_tests(event, update_mode=True)
+    response = teams.perform_update(event)
 
     # Return
     return lib.get_json(response)
