@@ -4,7 +4,7 @@ import json
 import decimal
 import validation
 import exceptions
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Key, Attr
 
 # TeamsTable = boto3.resource('dynamodb', region_name='us-east-1').Table('teams')
 # LeaguesTable = boto3.resource('dynamodb', region_name='us-east-1').Table('leagues')
@@ -87,6 +87,45 @@ def create_expression_attribute_values(keys, event, body=True):
         values[":%s" % key] = event_key_source[key]
 
     return values
+
+
+def create_key_condition_expression(key_dict):
+    """
+    Create a DynamoDB KeyConditionExpression object from a dictionary.
+    :param key_dict: The key dictionary to build into a query.
+    :return: A boto3.dynamodb.conditions.And or boto3.dynamodb.conditions.Equals
+    """
+    cond_obj = None
+    for key in key_dict.keys():
+        if cond_obj is None:
+            # This is the first key
+            cond_obj = Key(key).eq(key_dict[key])
+        # Combine the objects together
+        cond_obj = cond_obj & Key(key).eq(key_dict[key])
+
+    # @TODO: This should probably spit out an exception.
+    return cond_obj
+
+
+def query_table(table, index, expression):
+    """
+    Perform a query against a table.
+    :param table: Table object.
+    :param index: Name of the index to query.
+    :param expression: KeyConditionExpression needed to perform query.
+    :return:
+    """
+    results = table.query(
+        IndexName=index,
+        KeyConditionExpression=expression
+    )
+    if len(results['Items']) < 1:
+        raise exceptions.NotFoundException(
+            "No objects found in '%s' query on table '%s'." % (table.table_name, index))
+
+    return results['Items']
+    # "Teams of institution '%s' and is_women '%s' not found." % (
+    #     institution_id, is_women))
 
 
 def update_database_element(table, event, keys, drop_id=True):
@@ -172,3 +211,13 @@ def delete_database_element(table, event):
                 "Object '%s' not found." % event['pathId'])
 
         raise exceptions.InternalServerException(ce.message)
+
+
+def scan_database_table(table):
+    """
+    Scan a table. Note - this is an expensive operation so don't do it
+    too much.
+    :param table:
+    :return:
+    """
+    return table.scan()['Items']

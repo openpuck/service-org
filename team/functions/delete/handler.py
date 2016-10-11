@@ -22,7 +22,7 @@ import lib.teams as teams
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    teams.perform_input_tests(event, mode=lib.validation.MODE_DELETE)
+    # teams.perform_input_tests(event, mode=lib.validation.MODE_DELETE)
     response = teams.perform_delete(event)
 
     # Return

@@ -2,8 +2,8 @@
 import validation
 from uuid import uuid4
 from lib.tables import LeaguesTable, ConferencesTable, TeamsTable
-from lib import create_database_element, update_database_element, read_database_element, delete_database_element
-from lib.exceptions import BadRequestException
+from lib import create_database_element, update_database_element, read_database_element, delete_database_element, scan_database_table, query_table, create_key_condition_expression
+from lib.exceptions import BadRequestException, ClientError, InternalServerException
 
 
 # These are the required attributes for this object.
@@ -80,34 +80,37 @@ def test_relations(event):
                                        event['body']['league'])
 
 
-def perform_update(event):
-    """
-    Take the event and use it to update an existing object in the database.
-    :param event: The verified event.
-    :return: A JSON blob of the updated object.
-    """
-    return update_database_element(table=TeamsTable, event=event, keys=required_keys)
-
-
 def perform_create(event):
     """
     Take the event and use it to create a new object in the database.
-    :param event: The verified event.
+    :param event: The event.
     :return: A JSON blob of the new object.
     """
     # Jam in an ID for the new object.
     event['body']['id'] = str(uuid4())
 
+    perform_input_tests(event, mode=validation.MODE_CREATE)
     return create_database_element(TeamsTable, event)
 
 
 def perform_read(event):
     """
     Take the event and use it to read an existing object from the database.
-    :param event: The verified event.
+    :param event: The event.
     :return: A JSON blob of the object.
     """
+    perform_input_tests(event, mode=validation.MODE_READ)
     return read_database_element(table=TeamsTable, event=event)
+
+
+def perform_update(event):
+    """
+    Take the event and use it to update an existing object in the database.
+    :param event: The event.
+    :return: A JSON blob of the updated object.
+    """
+    perform_input_tests(event, mode=validation.MODE_UPDATE)
+    return update_database_element(table=TeamsTable, event=event, keys=required_keys)
 
 
 def perform_delete(event):
@@ -116,4 +119,27 @@ def perform_delete(event):
     :param event: The verified event.
     :return: A JSON blob of the object.
     """
+    perform_input_tests(event, mode=validation.MODE_DELETE)
     return delete_database_element(table=TeamsTable, event=event)
+
+
+def perform_list(event):
+    """
+    Take the event and use it to list objects from the database.
+    :param event: The Lambda event.
+    :return: A JSON blob of objects.
+    """
+    try:
+        # You have to use == or Python gets stupid.
+        if event['institution'] == "" or event['is_women'] == "":
+            return scan_database_table(TeamsTable)
+        else:
+            key_expression_dict = {
+                "institution": event['institution'],
+                "is_women": event['is_women']
+            }
+            key_expression = create_key_condition_expression(key_expression_dict)
+
+            return query_table(TeamsTable, "TeamsByInstitutionGender", key_expression)
+    except ClientError as ce:
+        raise InternalServerException(ce.message)
