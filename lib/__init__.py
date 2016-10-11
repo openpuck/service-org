@@ -100,6 +100,7 @@ def create_key_condition_expression(key_dict):
         if cond_obj is None:
             # This is the first key
             cond_obj = Key(key).eq(key_dict[key])
+            continue
         # Combine the objects together
         cond_obj = cond_obj & Key(key).eq(key_dict[key])
 
