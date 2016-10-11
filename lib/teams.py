@@ -84,7 +84,7 @@ def perform_create(event):
     """
     Take the event and use it to create a new object in the database.
     :param event: The event.
-    :return: A JSON blob of the new object.
+    :return: A blob of the new object.
     """
     # Jam in an ID for the new object.
     event['body']['id'] = str(uuid4())
@@ -107,7 +107,7 @@ def perform_update(event):
     """
     Take the event and use it to update an existing object in the database.
     :param event: The event.
-    :return: A JSON blob of the updated object.
+    :return: A blob of the updated object.
     """
     perform_input_tests(event, mode=validation.MODE_UPDATE)
     return update_database_element(table=TeamsTable, event=event, keys=required_keys)
@@ -117,7 +117,7 @@ def perform_delete(event):
     """
     Take the event and use it to delete an existing object from the database.
     :param event: The verified event.
-    :return: A JSON blob of the object.
+    :return: A blob of the object.
     """
     perform_input_tests(event, mode=validation.MODE_DELETE)
     return delete_database_element(table=TeamsTable, event=event)
@@ -127,7 +127,7 @@ def perform_list(event):
     """
     Take the event and use it to list objects from the database.
     :param event: The Lambda event.
-    :return: A JSON blob of objects.
+    :return: A blob of objects.
     """
     try:
         # You have to use == or Python gets stupid.
