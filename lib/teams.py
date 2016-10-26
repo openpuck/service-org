@@ -2,9 +2,9 @@
 import validation
 from uuid import uuid4
 from lib.tables import LeaguesTable, ConferencesTable, TeamsTable
-from lib import create_database_element, update_database_element, read_database_element, delete_database_element, scan_database_table, query_table, create_key_condition_expression
+# from lib import create_database_element, update_database_element, read_database_element, delete_database_element, scan_database_table, query_table, create_key_condition_expression
 from lib.exceptions import BadRequestException, ClientError, InternalServerException
-
+from lib.database import scan_table, query_table
 
 # These are the required attributes for this object.
 required_keys = ['nickname', 'institution', 'provider', 'is_women',
@@ -132,14 +132,13 @@ def perform_list(event):
     try:
         # You have to use == or Python gets stupid.
         if event['institution'] == "" or event['is_women'] == "":
-            return scan_database_table(TeamsTable)
+            return scan_table(TeamsTable)
         else:
             key_expression_dict = {
                 "institution": event['institution'],
                 "is_women": event['is_women']
             }
-            key_expression = create_key_condition_expression(key_expression_dict)
 
-            return query_table(TeamsTable, "TeamsByInstitutionGender", key_expression)
+            return query_table(TeamsTable, "TeamsByInstitutionGender", key_expression_dict)
     except ClientError as ce:
         raise InternalServerException(ce.message)

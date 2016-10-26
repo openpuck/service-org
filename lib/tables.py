@@ -2,8 +2,8 @@
 
 import lib
 
-LeaguesTable = lib.get_table(lib.LEAGUES_TABLE)
-TeamsTable = lib.get_table(lib.TEAMS_TABLE)
-ConferencesTable = lib.get_table(lib.CONFERENCES_TABLE)
-InstitutionsTable = lib.get_table(lib.INSTITUTIONS_TABLE)
-SeasonsTable = lib.get_table(lib.SEASONS_TABLE)
+LeaguesTable = lib.database.get_table(lib.database.LEAGUES_TABLE)
+TeamsTable = lib.database.get_table(lib.database.TEAMS_TABLE)
+ConferencesTable = lib.database.get_table(lib.database.CONFERENCES_TABLE)
+InstitutionsTable = lib.database.get_table(lib.database.INSTITUTIONS_TABLE)
+SeasonsTable = lib.database.get_table(lib.database.SEASONS_TABLE)
