@@ -1,10 +1,9 @@
 #!/usr/bin/env python
+import database
 import validation
 from uuid import uuid4
 from lib.tables import LeaguesTable, ConferencesTable, TeamsTable
-# from lib import create_database_element, update_database_element, read_database_element, delete_database_element, scan_database_table, query_table, create_key_condition_expression
-from lib.exceptions import BadRequestException, ClientError, InternalServerException
-from lib.database import scan_table, query_table
+from lib.exceptions import *
 
 # These are the required attributes for this object.
 required_keys = ['nickname', 'institution', 'provider', 'is_women',
@@ -19,47 +18,18 @@ def perform_input_tests(event, mode):
     :return: None if success, Exception if failed.
     """
     if mode == validation.MODE_CREATE or mode == validation.MODE_UPDATE:
-        test_keys(event, mode)
-        test_validation(event)
+        validation.test_keys(event, mode, required_keys)
+        validation.test_types(event)
         test_relations(event)
     elif mode == validation.MODE_READ:
-        test_keys(event, mode)
+        validation.test_keys(event, mode, required_keys)
     elif mode == validation.MODE_DELETE:
         # @TODO: Test for delete
         pass
     else:
         # If we get here, something went very wrong.
-        raise BadRequestException("Invalid input test validation mode specified ('%s')." % mode)
-
-
-def test_keys(event, mode):
-    # @TODO: Move this to validation and make generic
-    """
-    Tests for the presence of required keys in the event.
-    :param event: The event to test.
-    :param mode: Determines which checks should be performed.
-    :return: None if success, Exception if failed.
-    """
-    if mode == validation.MODE_CREATE:
-        validation.check_keys(required_keys, event)
-    elif mode == validation.MODE_READ or mode == validation.MODE_DELETE:
-        validation.check_keys(['pathId'], event, False)
-    elif mode == validation.MODE_UPDATE:
-        validation.check_keys(['pathId'], event, False)
-        validation.check_keys(required_keys, event)
-    else:
-        # If we get here, something went very wrong.
-        raise BadRequestException("Invalid key validation mode specified ('%s')." % mode)
-
-
-def test_validation(event):
-    # @TODO: Move this to validation and make generic.
-    """
-    Perform data type validation on certain keys.
-    :param event: The event to test.
-    :return: None if success, Exception if failed.
-    """
-    validation.check_boolean(event, ['is_women', 'is_active'])
+        raise BadRequestException("Invalid input test validation mode "
+                                  "specified ('%s')." % mode)
 
 
 def test_relations(event):
@@ -68,16 +38,16 @@ def test_relations(event):
     :param event: The event to test.
     :return: None if success, Exception if failed.
     """
-    validation.check_relation(LeaguesTable, 'id',
+    validation.test_relation(LeaguesTable, 'id',
+                             event['body']['league'])
+    validation.test_relation(ConferencesTable, 'id',
+                             event['body']['conference'])
+    validation.test_relation_attr(ConferencesTable, 'id',
+                                  event['body']['conference'], 'is_women',
+                                  event['body']['is_women'])
+    validation.test_relation_attr(ConferencesTable, 'id',
+                                  event['body']['conference'], 'league',
                                   event['body']['league'])
-    validation.check_relation(ConferencesTable, 'id',
-                                  event['body']['conference'])
-    validation.check_relation_attr(ConferencesTable, 'id',
-                                       event['body']['conference'], 'is_women',
-                                       event['body']['is_women'])
-    validation.check_relation_attr(ConferencesTable, 'id',
-                                       event['body']['conference'], 'league',
-                                       event['body']['league'])
 
 
 def perform_create(event):
@@ -90,7 +60,7 @@ def perform_create(event):
     event['body']['id'] = str(uuid4())
 
     perform_input_tests(event, mode=validation.MODE_CREATE)
-    return create_database_element(TeamsTable, event)
+    return database.create_element(TeamsTable, event)
 
 
 def perform_read(event):
@@ -100,7 +70,7 @@ def perform_read(event):
     :return: A JSON blob of the object.
     """
     perform_input_tests(event, mode=validation.MODE_READ)
-    return read_database_element(table=TeamsTable, event=event)
+    return database.read_element(table=TeamsTable, event=event)
 
 
 def perform_update(event):
@@ -110,7 +80,8 @@ def perform_update(event):
     :return: A blob of the updated object.
     """
     perform_input_tests(event, mode=validation.MODE_UPDATE)
-    return update_database_element(table=TeamsTable, event=event, keys=required_keys)
+    return database.update_element(table=TeamsTable, event=event,
+                                   keys=required_keys)
 
 
 def perform_delete(event):
@@ -120,7 +91,7 @@ def perform_delete(event):
     :return: A blob of the object.
     """
     perform_input_tests(event, mode=validation.MODE_DELETE)
-    return delete_database_element(table=TeamsTable, event=event)
+    return database.delete_element(table=TeamsTable, event=event)
 
 
 def perform_list(event):
@@ -132,13 +103,14 @@ def perform_list(event):
     try:
         # You have to use == or Python gets stupid.
         if event['institution'] == "" or event['is_women'] == "":
-            return scan_table(TeamsTable)
+            return database.scan_table(TeamsTable)
         else:
             key_expression_dict = {
                 "institution": event['institution'],
                 "is_women": event['is_women']
             }
 
-            return query_table(TeamsTable, "TeamsByInstitutionGender", key_expression_dict)
+            return database.query_table(TeamsTable, "TeamsByInstitutionGender",
+                                        key_expression_dict)
     except ClientError as ce:
         raise InternalServerException(ce.message)

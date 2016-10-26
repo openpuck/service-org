@@ -3,14 +3,17 @@ from lib.exceptions import *
 from decimal import Decimal, InvalidOperation
 from boto3.dynamodb.conditions import Key
 
-
+# Validation Modes
 MODE_CREATE = "CREATE"
 MODE_READ = "READ"
 MODE_UPDATE = "UPDATE"
 MODE_DELETE = "DELETE"
 
+# Data Type Attributes
+BOOLEAN_FIELDS = ['is_women', 'is_active']
 
-def build_key_expression_from_dict(data):
+
+def _build_key_expression_from_dict(data):
     """
     Build a KeyConditionExpression object from a dictionary of key:value pairs.
     :param data: The dictionary of data.
@@ -26,7 +29,7 @@ def build_key_expression_from_dict(data):
     return key_object
 
 
-def string_length(input_string, num_chars):
+def _string_length(input_string, num_chars):
     """
     Check that a given string is of the given length.
     :param input_string: The string to test.
@@ -38,7 +41,7 @@ def string_length(input_string, num_chars):
                                   "(max: %d)." % (input_string, num_chars))
 
 
-def check_keys(keys, event, body=True):
+def _check_keys(keys, event, body=True):
     """
     Check that all of the given keys exist within an event. Two code paths
     for the ability to test the event and the event body.
@@ -61,7 +64,7 @@ def check_keys(keys, event, body=True):
                 raise BadRequestException("Key '%s' is empty." % key)
 
 
-def check_boolean(event, keys, body=True):
+def _check_boolean(event, keys, body=True):
     """
     Because Dynamo can't have a boolean as a RangeKey, I have
     implemented booleans there as "yes" or "no". This tests for that.
@@ -87,7 +90,7 @@ def check_boolean(event, keys, body=True):
                                           (key, event[key]))
 
 
-def check_decimal(event, keys, body=True):
+def _check_decimal(event, keys, body=True):
     """
     Ensure that certain values are a valid Decimal and not a string.
     :param event: The event object from Lambda.
@@ -117,7 +120,39 @@ def check_decimal(event, keys, body=True):
                     (key, event[key]))
 
 
-def check_relation(foreign_table, key, value):
+def _check_duplicate(dynamo_table, table_index, keys, exclude_value=None,
+                     exclude_attr='id'):
+    """
+    Checks for a duplicate entry of the given keys in a given table using a
+    given index.
+    :param dynamo_table: The Table object to search.
+    :param table_index: The name of the index to search in.
+    :param keys: Dictionary of the keys needed for the index.
+    :param exclude_value: Optional value to exclude from duplicate detection.
+    :return: None if Good, Exception if Duplicate.
+    """
+
+    try:
+        results = dynamo_table.query(IndexName=table_index,
+                                     KeyConditionExpression=
+                                     _build_key_expression_from_dict(keys))
+        # If there is one and only one result, and we were given an exclude id
+        # (likely for update) - See if it's the thing we're updating.
+        if len(results['Items']) == 1 and exclude_value is not None:
+            # The ID needs to match, else it's toast
+            if results['Items'][0][exclude_attr] == exclude_value:
+                return
+        # No results means no duplicates
+        if len(results['Items']) == 0:
+            return
+        # Whelp, you dun goofd Jon Snow
+        raise BadRequestException("Duplicate object (Keys:%s) found in table "
+                                  "'%s'" % (keys, dynamo_table.table_name))
+    except ClientError as ce:
+        raise InternalServerException(ce.message)
+
+
+def test_relation(foreign_table, key, value):
     """
     Check a foreign table for an entry. It's basically relations, with no-SQL!
     :param foreign_table: The foreign table object.
@@ -137,8 +172,8 @@ def check_relation(foreign_table, key, value):
                                 (value, foreign_table.table_name))
 
 
-def check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
-                        foreign_attr, value):
+def test_relation_attr(foreign_table, foreign_key_attr, foreign_key,
+                       foreign_attr, value):
     """
     Check a local value against a given attribute of a specific item
     from another table.
@@ -172,29 +207,34 @@ def check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
                              foreign_key, foreign_attr, value))
 
 
-def check_duplicate(DynamoTable, table_index, keys, exclude_value=None, exclude_attr='id'):
+def test_types(event):
     """
-    Checks for a duplicate entry of the given keys in a given table using a
-    given index.
-    :param DynamoTable: The Table object to search.
-    :param table_index: The name of the index to search in.
-    :param keys: Dictionary of the keys needed for the index.
-    :param exclude_id: Optional id to exclude from duplicate detection (for updates)
-    :return: None if Good, Exception if Duplicate.
+    Perform data type validation on certain keys.
+    :param event: The event to test.
+    :return: None if success, Exception if failed.
     """
+    _check_boolean(event, BOOLEAN_FIELDS)
+    # I'm sure there will be more here some day.
 
-    try:
-        results = DynamoTable.query(IndexName=table_index, KeyConditionExpression=build_key_expression_from_dict(keys))
-        # If there is one and only one result, and we were given an exclude id
-        # (likely for update) - See if it's the thing we're updating.
-        if len(results['Items']) == 1 and exclude_value is not None:
-            # The ID needs to match, else it's toast
-            if results['Items'][0][exclude_attr] == exclude_value:
-                return
-        # No results means no duplicates
-        if len(results['Items']) == 0:
-            return
-        # Whelp, you dun goofd Jon Snow
-        raise BadRequestException("Duplicate object (Keys:%s) found in table '%s'" % (keys, DynamoTable.table_name))
-    except ClientError as ce:
-        raise InternalServerException(ce.message)
+
+def test_keys(event, mode, required_keys):
+    """
+    Tests for the presence of required keys in the event.
+    :param event: The event to test.
+    :param mode: Determines which checks should be performed.
+    :param required_keys: List of keys to test for in the event.
+    :return: None if success, Exception if failed.
+    """
+    if mode == MODE_CREATE:
+        # We need all of the required keys for this.
+        _check_keys(required_keys, event)
+    elif mode == MODE_READ or mode == MODE_DELETE:
+        # ID is the only field we care about, so ignore the required_keys.
+        _check_keys(['pathId'], event, False)
+    elif mode == MODE_UPDATE:
+        # This requires both ID and a set of keys.
+        _check_keys(['pathId'], event, False)
+        _check_keys(required_keys, event)
+    else:
+        # If we get here, something went very wrong.
+        raise BadRequestException("Invalid key validation mode specified ('%s')." % mode)
