@@ -17,7 +17,6 @@ sys.path.append(os.path.join(here, "../vendored"))
 # referenced as `lib.something`
 import lib
 import lib.teams as teams
-# from boto3.dynamodb.conditions import Key
 
 
 def handler(event, context):

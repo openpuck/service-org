@@ -22,7 +22,6 @@ import lib.teams as teams
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # teams.perform_input_tests(event, mode=lib.validation.MODE_CREATE)
     response = teams.perform_create(event)
 
     # Return
