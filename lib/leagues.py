@@ -2,7 +2,7 @@
 import database
 import validation
 from uuid import uuid4
-from lib.tables import LeaguesTable
+from lib.tables import LeaguesTable, TeamsTable
 from lib.exceptions import *
 
 # These are the required attributes for this object.
@@ -118,5 +118,39 @@ def perform_list(event):
                 return league_results[0]
 
             raise NotFoundException("Abbreviated league '%s' not found." % search_abbr)
+    except ClientError as ce:
+        raise InternalServerException(ce.message)
+
+
+def perform_list_by_institution(event):
+    """
+    Take the event and use it to list leagues from the database by a given
+    institution.
+    :param event: The Lambda event.
+    :return: A list of database elements.
+    """
+    try:
+        leagues = []
+
+        # We first must get the Team objects for this institution.
+        teams_query_exp = {
+            "institution": event['pathId']
+        }
+        team_results = database.query_table(TeamsTable, "TeamsByInstitutionGender", teams_query_exp)
+
+        # Foreach team, grab it's league object
+        for team in team_results:
+            league_event = {"pathId": team['league']}
+            league_result = database.read_element(LeaguesTable, league_event)
+
+            # Check if the league is already there
+            if not leagues:
+                leagues.append(league_result)
+            else:
+                for league in leagues:
+                    if league['id'] != league_result['id']:
+                        leagues.append(league_result)
+        # Done
+        return leagues
     except ClientError as ce:
         raise InternalServerException(ce.message)

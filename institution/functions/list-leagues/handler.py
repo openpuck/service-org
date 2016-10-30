@@ -16,33 +16,13 @@ sys.path.append(os.path.join(here, "../../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
-from boto3.dynamodb.conditions import Key
+import lib.leagues as leagues
+
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Test for required attributes
-    lib.validation.check_keys(['pathId'], event, False)
+    response = leagues.perform_list_by_institution(event)
 
-    try:
-        leagues = []
-        # Get Teams
-        teams_result = lib.TeamsTable.query(
-            IndexName='TeamsByInstitutionGender',
-            KeyConditionExpression=Key('institution').eq(event['pathId'])
-        )
-        # Foreach team, grab it's league object
-        for team in teams_result['Items']:
-            league_response = lib.LeaguesTable.get_item(
-                Key={'id': team['league']})
-            # Check if the league is already there
-            if not leagues:
-                leagues.append(league_response['Item'])
-            else:
-                for league in leagues:
-                    if league['id'] != league_response['Item']['id']:
-                        leagues.append(league_response['Item'])
-        # Done
-        return lib.get_json(leagues)
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    # Return
+    return lib.get_json(response)

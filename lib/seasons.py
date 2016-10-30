@@ -135,3 +135,21 @@ def perform_list(event):
             raise NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
     except ClientError as ce:
         raise InternalServerException(ce.message)
+
+
+def perform_list_by_league(event):
+    """
+    List seasons from the database by a given league.
+    :param event: The Lambda event.
+    :return: A list of database elements.
+    """
+    try:
+        # Get the Conference objects for this institution.
+        seasons_query_exp = {
+            "league": event['pathId']
+        }
+        season_results = database.query_table(SeasonsTable, "SeasonByLeagueGender",
+                                              seasons_query_exp)
+        return season_results
+    except ClientError as ce:
+        raise InternalServerException(ce.message)

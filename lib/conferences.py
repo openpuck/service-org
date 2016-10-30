@@ -153,3 +153,21 @@ def perform_list(event):
             # return lib.get_json(league_result['Items'])
     except ClientError as ce:
         raise InternalServerException(ce.message)
+
+
+def perform_list_by_league(event):
+    """
+    List conferences from the database by a given league.
+    :param event: The Lambda event.
+    :return: A list of database elements.
+    """
+    try:
+        # Get the Conference objects for this institution.
+        conferences_query_exp = {
+            "league": event['pathId']
+        }
+        conference_results = database.query_table(ConferencesTable, "ConfByLeagueGender",
+                                                  conferences_query_exp)
+        return conference_results
+    except ClientError as ce:
+        raise InternalServerException(ce.message)

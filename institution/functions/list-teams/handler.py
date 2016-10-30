@@ -16,19 +16,13 @@ sys.path.append(os.path.join(here, "../../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
-from boto3.dynamodb.conditions import Key
+import lib.teams as teams
+
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Test for required attributes
-    lib.validation.check_keys(['pathId'], event, False)
+    response = teams.perform_list_by_institution(event)
 
-    try:
-        result = lib.TeamsTable.query(
-            IndexName='TeamsByInstitutionGender',
-            KeyConditionExpression=Key('institution').eq(event['pathId'])
-        )
-        return lib.get_json(result['Items'])
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    # Return
+    return lib.get_json(response)
