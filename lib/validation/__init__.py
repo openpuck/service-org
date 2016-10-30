@@ -172,7 +172,8 @@ def _check_relation(foreign_table, key, value):
                                 (value, foreign_table.table_name))
 
 
-def test_relation_attr(foreign_table, foreign_key_attr, foreign_key,
+# @TODO: These names are stupid.
+def _check_relation_attr(foreign_table, foreign_key_attr, foreign_key,
                        foreign_attr, value):
     """
     Check a local value against a given attribute of a specific item
@@ -250,6 +251,13 @@ def test_relations(relations):
     for relation in relations:
         _check_relation(foreign_table=relation['table'], key=relation['key'],
                         value=relation['value'])
+        if hasattr(relation, "foreign_key") and hasattr(relation, "foreign_value"):
+            _check_relation_attr(foreign_table=relation['table'],
+                                 foreign_key_attr=relation['key'],
+                                 foreign_key=relation['value'],
+                                 foreign_attr=relation['foreign_key'],
+                                 value=relation['foreign_value']
+                                 )
 
 
 def test_duplicates(duplicates):

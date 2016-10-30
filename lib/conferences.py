@@ -2,12 +2,11 @@
 import database
 import validation
 from uuid import uuid4
-from lib.tables import LeaguesTable, ConferencesTable, TeamsTable
+from lib.tables import LeaguesTable, ConferencesTable
 from lib.exceptions import *
 
 # These are the required attributes for this object.
-required_keys = ['nickname', 'institution', 'provider', 'is_women',
-                 'league', 'conference', 'is_active', 'website']
+required_keys = ['id', 'cn', 'is_women', 'abbr', 'website', 'league']
 
 
 def _build_relations(event):
@@ -21,27 +20,7 @@ def _build_relations(event):
             "table": LeaguesTable,
             "key": "id",
             "value": event['body']['league']
-        },
-        {
-            "table": ConferencesTable,
-            "key": "id",
-            "value": event['body']['conference']
-        },
-        {
-            "table": ConferencesTable,
-            "key": "id",
-            "value": event['body']['conference'],
-            "foreign_key": "is_women",
-            "foreign_value": event['body']['is_women']
-        },
-        {
-            "table": ConferencesTable,
-            "key": "id",
-            "value": event['body']['conference'],
-            "foreign_key": "league",
-            "foreign_value": event['body']['league']
-        },
-
+        }
     ]
 
     return relations
@@ -62,7 +41,18 @@ def _build_duplicates(event, mode):
         exclude_value = event['pathId']
 
     # This is a list of dictionaries.
-    duplicates = []
+    duplicates = [
+        {
+            "table": ConferencesTable,
+            "index": 'ConfByAbbrGender',
+            "keys": {
+                'abbr': event['body']['abbr'],
+                'is_women': event['body']['is_women']
+            },
+            "exclude_attr": exclude_attr,
+            "exclude_value": exclude_value
+        }
+    ]
 
     # We good
     return duplicates
@@ -80,9 +70,8 @@ def perform_create(event):
     validation.run_event_input_tests(event=event, mode=validation.MODE_CREATE,
                                      required_keys=required_keys,
                                      relations=_build_relations(event),
-                                     duplicates=_build_duplicates(event,
-                                                                  validation.MODE_CREATE))
-    return database.create_element(TeamsTable, event)
+                                     duplicates=_build_duplicates(event, validation.MODE_CREATE))
+    return database.create_element(ConferencesTable, event)
 
 
 def perform_read(event):
@@ -93,7 +82,7 @@ def perform_read(event):
     """
     validation.run_event_input_tests(event=event, mode=validation.MODE_READ,
                                      required_keys=required_keys)
-    return database.read_element(table=TeamsTable, event=event)
+    return database.read_element(table=ConferencesTable, event=event)
 
 
 def perform_update(event):
@@ -107,8 +96,7 @@ def perform_update(event):
                                      relations=_build_relations(event),
                                      duplicates=_build_duplicates(event,
                                                                   validation.MODE_UPDATE))
-    return database.update_element(table=TeamsTable, event=event,
-                                   keys=required_keys)
+    return database.update_element(ConferencesTable, event, required_keys)
 
 
 def perform_delete(event):
@@ -118,7 +106,8 @@ def perform_delete(event):
     :return: A blob of the object.
     """
     validation.run_event_input_tests(event=event, mode=validation.MODE_DELETE)
-    return database.delete_element(table=TeamsTable, event=event)
+
+    return database.delete_element(table=ConferencesTable, event=event)
 
 
 def perform_list(event):
@@ -127,17 +116,40 @@ def perform_list(event):
     :param event: The Lambda event.
     :return: A blob of objects.
     """
+    # Query
+    league_abbr = event['league_abbr']
+    conf_abbr = event['conf_abbr']
+    is_women = event['is_women']
+
     try:
         # You have to use == or Python gets stupid.
-        if event['institution'] == "" or event['is_women'] == "":
-            return database.scan_table(TeamsTable)
+        if league_abbr == "" or conf_abbr == "" or is_women == "":
+            return database.scan_table(ConferencesTable)
         else:
-            key_expression_dict = {
-                "institution": event['institution'],
-                "is_women": event['is_women']
+            # Query for the leagues matching the abbr given.
+            leagues_query_exp = {
+                "abbr": league_abbr
             }
+            league_results = database.query_table(LeaguesTable, "AbbrIndex", leagues_query_exp)
 
-            return database.query_table(TeamsTable, "TeamsByInstitutionGender",
-                                        key_expression_dict)
+            # Now find the conference.
+            for league in league_results:
+                conf_query_exp = {
+                    "league": league['id']
+                }
+                conf_results = database.query_table(ConferencesTable, "ConfByLeagueGender", conf_query_exp)
+
+                entries = []
+                for conf in conf_results:
+                    if conf['abbr'] == conf_abbr and conf['is_women'] == is_women:
+                        entries.append(conf)
+
+                # We will only return the first one if there are more.
+                # @TODO This might need to be an exception.
+                if len(entries) >= 1:
+                    return entries[0]
+
+                raise NotFoundException("Conference '%s' not found for league '%s' with is_women='%s'." % (conf_abbr, league_abbr, is_women))
+            # return lib.get_json(league_result['Items'])
     except ClientError as ce:
         raise InternalServerException(ce.message)
