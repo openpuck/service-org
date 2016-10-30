@@ -65,60 +65,44 @@ def _check_keys(keys, event, body=True):
                 raise BadRequestException("Key '%s' is empty." % key)
 
 
-def _check_boolean(event, keys, body=True):
+def _check_boolean(event, body=True):
     """
     Because Dynamo can't have a boolean as a RangeKey, I have
     implemented booleans there as "yes" or "no". This tests for that.
     :param event: The event object from Lambda.
-    :param keys: List of keys to test.
     :param body: Check in the body or in the event itself.
     :return: Nothing if success, exception if failed.
     """
-    for key in keys:
-        if body is True:
-            if key not in event['body'].keys():
-                raise BadRequestException("Key '%s' is missing." % key)
-            if not re.match(r"^(yes|no)$", event['body'][key]):
-                raise BadRequestException("Key '%s' contains an invalid "
-                                          "boolean value ('%s')." %
-                                          (key, event['body'][key]))
-        else:
-            if key not in event.keys():
-                raise BadRequestException("Key '%s' is missing." % key)
-            if re.match(r"yes|no", event[key]):
-                raise BadRequestException("Key '%s' contains an invalid "
-                                          "boolean value ('%s')." %
-                                          (key, event[key]))
+    event_keys = event.keys()
+    if body is True:
+        event_keys = event['body'].keys()
+
+    for key in event_keys:
+        if key in BOOLEAN_FIELDS and not re.match(r"^(yes|no)$", key):
+            raise BadRequestException("Key '%s' contains an invalid "
+                                      "boolean value ('%s')." %
+                                      (key, event_keys[key]))
 
 
-def _check_decimal(event, keys, body=True):
+def _check_decimal(event, body=True):
     """
     Ensure that certain values are a valid Decimal and not a string.
     :param event: The event object from Lambda.
-    :param keys: List of keys to test.
     :param body: Check in the body or in the event itself.
     :return: Nothing if success, exception if failed.
     """
-    for key in keys:
-        if body is True:
-            if key not in event['body'].keys():
-                raise BadRequestException("Key '%s' is missing." % key)
+    event_keys = event.keys()
+    if body is True:
+        event_keys = event['body'].keys()
+
+    for key in event_keys:
+        if key in DECIMAL_FIELDS:
             try:
-                Decimal(event['body'][key])
+                Decimal(event_keys[key])
             except InvalidOperation:
                 raise BadRequestException(
                     "Key '%s' contains an invalid decimal value ('%s')." %
-                    (key, event['body'][key]))
-        else:
-            if key not in event.keys():
-                raise BadRequestException("Key '%s' is missing." % key)
-            try:
-                Decimal(event[key])
-                return
-            except InvalidOperation:
-                raise BadRequestException(
-                    "Key '%s' contains an invalid decimal value ('%s')." %
-                    (key, event[key]))
+                    (key, event_keys[key]))
 
 
 def _check_duplicate(dynamo_table, table_index, keys, exclude_value=None,

@@ -68,7 +68,7 @@ get_test_league_id() {
 #    echoerr "BEGIN get-league_id"
     local endpoint="/league?abbr=${TEST_LEAGUE_ABBR}"
     local league=$(perform_call "GET" ${URL} ${endpoint} "")
-    local league_id=$(echo ${league} | jq -r '.[].id')
+    local league_id=$(echo ${league} | jq -r '.id')
 
     if [[ ${DEBUG} == 1 ]]; then
         echoerr "League ID:" "${league_id}"
@@ -106,7 +106,7 @@ get_test_institution_id() {
     # Return the id of our test institution.
     local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
     local institution=$(perform_call "GET" ${URL} ${endpoint} "")
-    local institution_id=$(echo ${institution} | jq -r '.[].id')
+    local institution_id=$(echo ${institution} | jq -r '.id')
 
     if [[ ${DEBUG} == 1 ]]; then
         echoerr "Institution ID:" "${institution_id}"

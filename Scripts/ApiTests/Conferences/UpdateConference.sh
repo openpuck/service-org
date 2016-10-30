@@ -6,7 +6,7 @@ source ../Common.sh
 # Test-specific vars
 ENDPOINT="/conference/$(get_test_conference_id)"
 METHOD="PUT"
-SUB_ATTR="abbr"
+SUB_ATTR="cn"
 SUB_VALUE="LOL WHO CARES"
 
 # Cook up the new object

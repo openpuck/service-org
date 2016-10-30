@@ -159,3 +159,21 @@ def perform_list_by_institution(event):
         return team_results
     except ClientError as ce:
         raise InternalServerException(ce.message)
+
+
+def perform_list_by_conference(event):
+    """
+    List teams from the database by a given conference.
+    :param event: The Lambda event.
+    :return: A list of database elements.
+    """
+    try:
+        # Get the Team objects for this institution.
+        teams_query_exp = {
+            "conference": event['pathId']
+        }
+        team_results = database.query_table(TeamsTable, "TeamsByConference",
+                                            teams_query_exp)
+        return team_results
+    except ClientError as ce:
+        raise InternalServerException(ce.message)
