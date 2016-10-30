@@ -82,7 +82,7 @@ get_test_conference_id() {
     # with it in other functions.
     local endpoint="/conference?league_abbr=${TEST_LEAGUE_ABBR}&conf_abbr=${TEST_CONFERENCE_ABBR}&is_women=${TEST_CONFERENCE_IS_WOMEN}"
     local conference=$(perform_call "GET" ${URL} ${endpoint} "")
-    local conference_id=$(echo ${conference} | jq -r '.id')
+    local conference_id=$(echo ${conference} | jq -r '.[].id')
 
     if [[ ${DEBUG} == 1 ]]; then
         echoerr "Conference ID:" "${conference_id}"
@@ -106,7 +106,7 @@ get_test_institution_id() {
     # Return the id of our test institution.
     local endpoint="/institution?cn=$(urlencode "${TEST_INSTITUTION_CN}")"
     local institution=$(perform_call "GET" ${URL} ${endpoint} "")
-    local institution_id=$(echo ${institution} | jq -r '.id')
+    local institution_id=$(echo ${institution} | jq -r '.[].id')
 
     if [[ ${DEBUG} == 1 ]]; then
         echoerr "Institution ID:" "${institution_id}"

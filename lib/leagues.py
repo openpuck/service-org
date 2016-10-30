@@ -127,7 +127,8 @@ def perform_list(event):
                 # @TODO: This should probably throw an exception.
                 return league_results
 
-            raise NotFoundException("Abbreviated league '%s' not found." % search_abbr)
+            return []
+            # raise NotFoundException("Abbreviated league '%s' not found." % search_abbr)
     except ClientError as ce:
         raise InternalServerException(ce.message)
 

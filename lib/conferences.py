@@ -149,7 +149,8 @@ def perform_list(event):
                 if len(entries) >= 1:
                     return entries
 
-                raise NotFoundException("Conference '%s' not found for league '%s' with is_women='%s'." % (conf_abbr, league_abbr, is_women))
+                # raise NotFoundException("Conference '%s' not found for league '%s' with is_women='%s'." % (conf_abbr, league_abbr, is_women))
+                return []
             # return lib.get_json(league_result['Items'])
     except ClientError as ce:
         raise InternalServerException(ce.message)

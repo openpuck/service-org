@@ -128,7 +128,8 @@ def perform_list(event):
                 # @TODO: This should probably throw an exception for >1.
                 return entries
 
-            raise NotFoundException("Institution '%s' not found." % search_cn)
+            # raise NotFoundException("Institution '%s' not found." % search_cn)
+            return []
 
     except ClientError as ce:
         raise InternalServerException(ce.message)

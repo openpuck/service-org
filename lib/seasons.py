@@ -144,7 +144,8 @@ def perform_list(event):
                 # @TODO: This should probably throw an exception for >1
                 return entries
 
-            raise NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
+            return []
+            # raise NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
     except ClientError as ce:
         raise InternalServerException(ce.message)
 
