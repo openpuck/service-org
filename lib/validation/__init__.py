@@ -152,7 +152,7 @@ def _check_duplicate(dynamo_table, table_index, keys, exclude_value=None,
         raise InternalServerException(ce.message)
 
 
-def test_relation(foreign_table, key, value):
+def _check_relation(foreign_table, key, value):
     """
     Check a foreign table for an entry. It's basically relations, with no-SQL!
     :param foreign_table: The foreign table object.
@@ -237,4 +237,57 @@ def test_keys(event, mode, required_keys):
         _check_keys(required_keys, event)
     else:
         # If we get here, something went very wrong.
-        raise BadRequestException("Invalid key validation mode specified ('%s')." % mode)
+        raise BadRequestException("Invalid key validation mode specified "
+                                  "('%s')." % mode)
+
+
+def test_relations(relations):
+    """
+    Test for any existing relations for this object.
+    :param relations: Tuple of relation dictionaries.
+    :return: None if success, Exception if failed.
+    """
+    for relation in relations:
+        _check_relation(foreign_table=relation['table'], key=relation['key'],
+                        value=relation['value'])
+
+
+def test_duplicates(duplicates):
+    """
+    Test for any duplicate objects.
+    :param duplicates: Tuple of duplicate dictionaries.
+    :return: None if success, Exception if failed.
+    """
+    for duplicate in duplicates:
+        _check_duplicate(dynamo_table=duplicate['table'],
+                         table_index=duplicate['index'],
+                         keys=duplicate['keys'],
+                         exclude_attr=duplicate['exclude_attr'],
+                         exclude_value=duplicate['exclude_value'],
+                         )
+
+
+def run_event_input_tests(event, mode, required_keys=None, relations=None, duplicates=None):
+    """
+    Metafunction to run the standard set of tests against the given event.
+    :param event: The event to test.
+    :param mode: Determines which checks should be performed.
+    :param required_keys: List of required event keys.
+    :param relations: A tuple of relations that need tested.
+    :param duplicates: A tuple of duplicates that need to be tested for.
+    :return: None if success, Exception if failed.
+    """
+    if mode == MODE_CREATE or mode == MODE_UPDATE:
+        test_keys(event=event, mode=mode, required_keys=required_keys)
+        test_types(event=event)
+        test_relations(relations=relations)
+        test_duplicates(duplicates=duplicates)
+    elif mode == MODE_READ:
+        test_keys(event=event, mode=mode, required_keys=required_keys)
+    elif mode == MODE_DELETE:
+        test_keys(event=event, mode=mode, required_keys=required_keys)
+        # @TODO: test for dependents
+    else:
+        # If we get here, something went very wrong.
+        raise BadRequestException("Invalid input test validation mode "
+                                  "specified ('%s')." % mode)
