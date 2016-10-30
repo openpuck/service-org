@@ -126,7 +126,7 @@ def perform_list(event):
                     entries.append(institution)
             if len(entries) >= 1:
                 # @TODO: This should probably throw an exception for >1.
-                return entries[0]
+                return entries
 
             raise NotFoundException("Institution '%s' not found." % search_cn)
 

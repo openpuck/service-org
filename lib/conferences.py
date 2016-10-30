@@ -147,7 +147,7 @@ def perform_list(event):
                 # We will only return the first one if there are more.
                 # @TODO This might need to be an exception.
                 if len(entries) >= 1:
-                    return entries[0]
+                    return entries
 
                 raise NotFoundException("Conference '%s' not found for league '%s' with is_women='%s'." % (conf_abbr, league_abbr, is_women))
             # return lib.get_json(league_result['Items'])

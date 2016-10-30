@@ -73,15 +73,15 @@ def _check_boolean(event, body=True):
     :param body: Check in the body or in the event itself.
     :return: Nothing if success, exception if failed.
     """
-    event_keys = event.keys()
+    event_body = event
     if body is True:
-        event_keys = event['body'].keys()
+        event_body = event['body']
 
-    for key in event_keys:
-        if key in BOOLEAN_FIELDS and not re.match(r"^(yes|no)$", key):
+    for key in event_body.keys():
+        if key in BOOLEAN_FIELDS and not re.match(r"^(yes|no)$", event_body[key]):
             raise BadRequestException("Key '%s' contains an invalid "
                                       "boolean value ('%s')." %
-                                      (key, event_keys[key]))
+                                      (key, event_body[key]))
 
 
 def _check_decimal(event, body=True):
@@ -91,18 +91,18 @@ def _check_decimal(event, body=True):
     :param body: Check in the body or in the event itself.
     :return: Nothing if success, exception if failed.
     """
-    event_keys = event.keys()
+    event_body = event
     if body is True:
-        event_keys = event['body'].keys()
+        event_body = event['body']
 
-    for key in event_keys:
+    for key in event_body.keys():
         if key in DECIMAL_FIELDS:
             try:
-                Decimal(event_keys[key])
+                Decimal(event_body[key])
             except InvalidOperation:
                 raise BadRequestException(
                     "Key '%s' contains an invalid decimal value ('%s')." %
-                    (key, event_keys[key]))
+                    (key, event_body[key]))
 
 
 def _check_duplicate(dynamo_table, table_index, keys, self_id,
@@ -118,25 +118,55 @@ def _check_duplicate(dynamo_table, table_index, keys, self_id,
     :return: None if Good, Exception if Duplicate.
     """
 
+    key_exp = _build_key_expression_from_dict(keys)
+    filter_exp = None
+
+    # We might need to engage a query filter.
+    if len(keys.keys()) > 2:
+        # HashKey
+        h_key, h_value = keys.popitem()
+        # RangeKey
+        r_key, r_value = keys.popitem()
+
+        # KeyConditionExpression
+        query_hash = {
+            h_key: h_value,
+            r_key: r_value
+        }
+        key_exp = _build_key_expression_from_dict(query_hash)
+        # FilterExpression
+        filter_exp = _build_key_expression_from_dict(keys)
+
     try:
+        # steps = "START:"
         results = dynamo_table.query(IndexName=table_index,
-                                     KeyConditionExpression=
-                                     _build_key_expression_from_dict(keys))
+                                     KeyConditionExpression=key_exp,
+                                     FilterExpression=filter_exp
+                                     )
         # If there is one and only one result, and we were given an exclude id
         # (likely for update) - See if it's the thing we're updating.
         # raise Exception(results['Items'])
         if len(results['Items']) == 1 and exclude_value is not None:
+            # steps += "1:"
             # Check that they keying attribute matches
+            # raise Exception("DB: %s, Local: %s" % (results['Items'][0][exclude_attr], exclude_value))
             if results['Items'][0][exclude_attr] == exclude_value:
+                # steps += "2:"
                 # And that it is actually us.
                 if results['Items'][0]['id'] == self_id:
+                    # steps += "3:"
                     # If this is not true, then we got someone elses
                     # object and the one we're working with.
+                    # raise Exception(steps)
                     return
         # No results means no duplicates
         if len(results['Items']) == 0:
+            # steps += "4:"
+            # raise Exception(steps)
             return
         # Whelp, you dun goofd Jon Snow
+        # steps += "5:"
+        # raise Exception(steps)
         raise BadRequestException("Duplicate object (Keys:%s) found in table "
                                   "'%s'" % (keys, dynamo_table.table_name))
     except ClientError as ce:

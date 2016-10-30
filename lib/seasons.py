@@ -42,7 +42,19 @@ def _build_duplicates(event, mode):
         exclude_value = event['pathId']
 
     # This is a list of dictionaries.
-    duplicates = []
+    duplicates = [
+        {
+            "table": SeasonsTable,
+            "index": "SeasonByLeagueStart",
+            "keys": {
+                "league": event['body']['league'],
+                "start_year": event['body']['start_year'],
+                "is_women": event['body']['is_women']
+            },
+            "exclude_attr": exclude_attr,
+            "exclude_value": exclude_value
+        }
+    ]
 
     # We good
     return duplicates
@@ -130,7 +142,7 @@ def perform_list(event):
 
             if len(entries) >= 1:
                 # @TODO: This should probably throw an exception for >1
-                return entries[0]
+                return entries
 
             raise NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
     except ClientError as ce:

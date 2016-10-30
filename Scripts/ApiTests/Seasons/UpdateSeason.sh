@@ -2,12 +2,12 @@
 
 # Load in our common stuff.
 source ../Common.sh
-
+z
 # Test-specific vars
 ENDPOINT="/season/$(get_test_season_id)"
 METHOD="PUT"
-SUB_ATTR="end_year"
-SUB_VALUE=2020
+SUB_ATTR="is_women"
+SUB_VALUE="no"
 
 # Cook up the new object
 output=$(perform_call "GET" ${URL} ${ENDPOINT} "" true)
