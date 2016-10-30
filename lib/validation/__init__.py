@@ -105,8 +105,8 @@ def _check_decimal(event, body=True):
                     (key, event_keys[key]))
 
 
-def _check_duplicate(dynamo_table, table_index, keys, exclude_value=None,
-                     exclude_attr='id'):
+def _check_duplicate(dynamo_table, table_index, keys, self_id,
+                     exclude_value=None, exclude_attr='id'):
     """
     Checks for a duplicate entry of the given keys in a given table using a
     given index.
@@ -114,6 +114,7 @@ def _check_duplicate(dynamo_table, table_index, keys, exclude_value=None,
     :param table_index: The name of the index to search in.
     :param keys: Dictionary of the keys needed for the index.
     :param exclude_value: Optional value to exclude from duplicate detection.
+    :param self_id: The ID of the self object to exclude.
     :return: None if Good, Exception if Duplicate.
     """
 
@@ -123,10 +124,15 @@ def _check_duplicate(dynamo_table, table_index, keys, exclude_value=None,
                                      _build_key_expression_from_dict(keys))
         # If there is one and only one result, and we were given an exclude id
         # (likely for update) - See if it's the thing we're updating.
+        # raise Exception(results['Items'])
         if len(results['Items']) == 1 and exclude_value is not None:
-            # The ID needs to match, else it's toast
+            # Check that they keying attribute matches
             if results['Items'][0][exclude_attr] == exclude_value:
-                return
+                # And that it is actually us.
+                if results['Items'][0]['id'] == self_id:
+                    # If this is not true, then we got someone elses
+                    # object and the one we're working with.
+                    return
         # No results means no duplicates
         if len(results['Items']) == 0:
             return
@@ -201,8 +207,8 @@ def test_types(event):
     """
     # @TODO: I'm pretty sure theres a bug here where it will try to validate
     # fields that are not actually present. How has this worked?
-    _check_boolean(event, BOOLEAN_FIELDS)
-    _check_decimal(event, DECIMAL_FIELDS)
+    _check_boolean(event)
+    _check_decimal(event)
 
 
 def test_keys(event, mode, required_keys):
@@ -247,18 +253,20 @@ def test_relations(relations):
                                  )
 
 
-def test_duplicates(duplicates):
+def test_duplicates(duplicates, event):
     """
     Test for any duplicate objects.
     :param duplicates: Tuple of duplicate dictionaries.
     :return: None if success, Exception if failed.
     """
+    self_id = event['pathId']
     for duplicate in duplicates:
         _check_duplicate(dynamo_table=duplicate['table'],
                          table_index=duplicate['index'],
                          keys=duplicate['keys'],
                          exclude_attr=duplicate['exclude_attr'],
                          exclude_value=duplicate['exclude_value'],
+                         self_id=self_id
                          )
 
 
@@ -276,7 +284,7 @@ def run_event_input_tests(event, mode, required_keys=None, relations=None, dupli
         test_keys(event=event, mode=mode, required_keys=required_keys)
         test_types(event=event)
         test_relations(relations=relations)
-        test_duplicates(duplicates=duplicates)
+        test_duplicates(duplicates=duplicates, event=event)
     elif mode == MODE_READ:
         test_keys(event=event, mode=mode, required_keys=required_keys)
     elif mode == MODE_DELETE:

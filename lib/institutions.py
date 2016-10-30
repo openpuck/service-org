@@ -30,12 +30,22 @@ def _build_duplicates(event, mode):
     # These set the exclusion parameters for an UPDATE operation. Otherwise
     # the duplication tests will detect itself and choke.
     exclude_value = None
-    exclude_attr = 'id'
+    exclude_attr = 'cn'
     if mode == validation.MODE_UPDATE:
-        exclude_value = event['pathId']
+        exclude_value = event['body']['cn']
 
     # This is a list of dictionaries.
-    duplicates = []
+    duplicates = [
+        {
+            "table": InstitutionsTable,
+            "index": "InstitutionByCn",
+            "keys": {
+                "cn": event['body']['cn']
+            },
+            "exclude_attr": exclude_attr,
+            "exclude_value": exclude_value
+        }
+    ]
 
     # We good
     return duplicates

@@ -200,7 +200,9 @@ def query_table(table, index, expression_dict):
         KeyConditionExpression=expression
     )
     if len(results['Items']) < 1:
-        raise NotFoundException(
-            "No objects found in '%s' query on table '%s'." % (table.table_name, index))
+        # Actually, it's OK to not have anything. 200+[] == There was nothing.
+        # raise NotFoundException(
+        #     "No objects found in '%s' query on table '%s'." % (table.table_name, index))
+        return []
 
     return results['Items']
