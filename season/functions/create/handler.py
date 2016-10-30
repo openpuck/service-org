@@ -16,28 +16,13 @@ sys.path.append(os.path.join(here, "../../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
-from uuid import uuid4
+import lib.seasons as seasons
 
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Auto-generate an ID
-    event['body']['id'] = str(uuid4())
-
-    # Test for required attributes
-    required_keys = ['id', 'is_women', 'league', 'start_year', 'end_year']
-    lib.validation.check_keys(required_keys, event)
-
-    # Validation
-    lib.validation.check_boolean(event, ['is_women'])
-    lib.validation.check_decimal(event, ['start_year', 'end_year'])
-
-    # Relations
-    lib.validation.check_relation(lib.LeaguesTable, 'id', event['body']['league'])
-
-    # Add to database
-    lib.perform_create(lib.SeasonsTable, event)
+    response = seasons.perform_create(event)
 
     # Return
-    return event['body']
+    return lib.get_json(response)

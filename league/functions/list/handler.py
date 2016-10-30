@@ -16,29 +16,13 @@ sys.path.append(os.path.join(here, "../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
-from boto3.dynamodb.conditions import Key, Attr
+import lib.leagues as leagues
 
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Query
-    search_abbr = event['abbr']
-    if search_abbr != "":
-        try:
-            result = lib.LeaguesTable.query(
-                IndexName='AbbrIndex',
-                KeyConditionExpression=Key('abbr').eq(search_abbr)
-            )
-            if result['Count'] is 0:
-                raise lib.exceptions.NotFoundException(
-                    "Abbreviated league '%s' not found." % search_abbr)
-            return lib.get_json(result['Items'])
-        except lib.exceptions.ClientError as ce:
-            raise lib.exceptions.InternalServerException(ce.message)
+    response = leagues.perform_list(event)
 
-    # Regular Return
-    try:
-        return lib.get_json(lib.LeaguesTable.scan()['Items'])
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
+    # Return
+    return lib.get_json(response)

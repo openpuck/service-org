@@ -16,23 +16,13 @@ sys.path.append(os.path.join(here, "../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
+import lib.institutions as institutions
 
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Validation
-    lib.validation.check_keys(['pathId'], event, False)
-
-    # Get response
-    try:
-        response = lib.InstitutionsTable.get_item(Key={'id': event['pathId']})
-    except lib.exceptions.ClientError as ce:
-        raise lib.exceptions.InternalServerException(ce.message)
-
-    if 'Item' not in response:
-        raise lib.exceptions.NotFoundException(
-            "Object '%s' not found." % event['pathId'])
+    response = institutions.perform_read(event)
 
     # Return
-    return lib.get_json(response['Item'])
+    return lib.get_json(response)

@@ -11,6 +11,7 @@ MODE_DELETE = "DELETE"
 
 # Data Type Attributes
 BOOLEAN_FIELDS = ['is_women', 'is_active']
+DECIMAL_FIELDS = ['start_year', 'end_year']
 
 
 def _build_key_expression_from_dict(data):
@@ -214,8 +215,10 @@ def test_types(event):
     :param event: The event to test.
     :return: None if success, Exception if failed.
     """
+    # @TODO: I'm pretty sure theres a bug here where it will try to validate
+    # fields that are not actually present. How has this worked?
     _check_boolean(event, BOOLEAN_FIELDS)
-    # I'm sure there will be more here some day.
+    _check_decimal(event, DECIMAL_FIELDS)
 
 
 def test_keys(event, mode, required_keys):

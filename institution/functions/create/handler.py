@@ -16,26 +16,13 @@ sys.path.append(os.path.join(here, "../../vendored"))
 # import the shared library, now anything in component/lib/__init__.py can be
 # referenced as `lib.something`
 import lib
-from uuid import uuid4
+import lib.institutions as institutions
 
 
 def handler(event, context):
     log.debug("Received event {}".format(json.dumps(event)))
 
-    # Auto-generate an ID
-    event['body']['id'] = str(uuid4())
-
-    # Test for required attributes
-    required_keys = ['cn', 'city']
-    lib.validation.check_keys(required_keys, event)
-
-    # Validation
-    # @TODO: Name doesnt exist
-
-    # Relations
-
-    # Add to database
-    lib.perform_create(lib.InstitutionsTable, event)
+    response = institutions.perform_create(event)
 
     # Return
-    return event['body']
+    return lib.get_json(response)

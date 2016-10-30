@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 import database
 import validation
+import decimal
 from uuid import uuid4
-from lib.tables import LeaguesTable, ConferencesTable
+from lib.tables import SeasonsTable, LeaguesTable
 from lib.exceptions import *
 
 # These are the required attributes for this object.
-required_keys = ['cn', 'is_women', 'abbr', 'website', 'league']
+required_keys = ['id', 'is_women', 'league', 'start_year', 'end_year']
 
 
 def _build_relations(event):
@@ -41,18 +42,7 @@ def _build_duplicates(event, mode):
         exclude_value = event['pathId']
 
     # This is a list of dictionaries.
-    duplicates = [
-        {
-            "table": ConferencesTable,
-            "index": 'ConfByAbbrGender',
-            "keys": {
-                'abbr': event['body']['abbr'],
-                'is_women': event['body']['is_women']
-            },
-            "exclude_attr": exclude_attr,
-            "exclude_value": exclude_value
-        }
-    ]
+    duplicates = []
 
     # We good
     return duplicates
@@ -71,7 +61,7 @@ def perform_create(event):
                                      required_keys=required_keys,
                                      relations=_build_relations(event),
                                      duplicates=_build_duplicates(event, validation.MODE_CREATE))
-    return database.create_element(ConferencesTable, event)
+    return database.create_element(SeasonsTable, event)
 
 
 def perform_read(event):
@@ -82,7 +72,7 @@ def perform_read(event):
     """
     validation.run_event_input_tests(event=event, mode=validation.MODE_READ,
                                      required_keys=required_keys)
-    return database.read_element(table=ConferencesTable, event=event)
+    return database.read_element(table=SeasonsTable, event=event)
 
 
 def perform_update(event):
@@ -96,7 +86,7 @@ def perform_update(event):
                                      relations=_build_relations(event),
                                      duplicates=_build_duplicates(event,
                                                                   validation.MODE_UPDATE))
-    return database.update_element(ConferencesTable, event, required_keys)
+    return database.update_element(SeasonsTable, event, required_keys)
 
 
 def perform_delete(event):
@@ -107,7 +97,7 @@ def perform_delete(event):
     """
     validation.run_event_input_tests(event=event, mode=validation.MODE_DELETE)
 
-    return database.delete_element(table=ConferencesTable, event=event)
+    return database.delete_element(table=SeasonsTable, event=event)
 
 
 def perform_list(event):
@@ -117,39 +107,31 @@ def perform_list(event):
     :return: A blob of objects.
     """
     # Query
-    league_abbr = event['league_abbr']
-    conf_abbr = event['conf_abbr']
+    league_id = event['league']
+    start_year = event['start_year']
     is_women = event['is_women']
 
     try:
         # You have to use == or Python gets stupid.
-        if league_abbr == "" or conf_abbr == "" or is_women == "":
-            return database.scan_table(ConferencesTable)
+        if league_id == "" or start_year == "":
+            return database.scan_table(SeasonsTable)
         else:
-            # Query for the leagues matching the abbr given.
-            leagues_query_exp = {
-                "abbr": league_abbr
+            # Now find the seasons.
+            seasons_query_exp = {
+                "league": league_id,
+                "start_year": decimal.Decimal(start_year)
             }
-            league_results = database.query_table(LeaguesTable, "AbbrIndex", leagues_query_exp)
+            season_results = database.query_table(SeasonsTable, "SeasonByLeagueStart", seasons_query_exp)
 
-            # Now find the conference.
-            for league in league_results:
-                conf_query_exp = {
-                    "league": league['id']
-                }
-                conf_results = database.query_table(ConferencesTable, "ConfByLeagueGender", conf_query_exp)
+            entries = []
+            for season in season_results:
+                if season['is_women'] == is_women:
+                    entries.append(season)
 
-                entries = []
-                for conf in conf_results:
-                    if conf['abbr'] == conf_abbr and conf['is_women'] == is_women:
-                        entries.append(conf)
+            if len(entries) >= 1:
+                # @TODO: This should probably throw an exception for >1
+                return entries[0]
 
-                # We will only return the first one if there are more.
-                # @TODO This might need to be an exception.
-                if len(entries) >= 1:
-                    return entries[0]
-
-                raise NotFoundException("Conference '%s' not found for league '%s' with is_women='%s'." % (conf_abbr, league_abbr, is_women))
-            # return lib.get_json(league_result['Items'])
+            raise NotFoundException("Season starting '%i' not found for league '%s' with is_women='%s'." % (start_year, league_id, is_women))
     except ClientError as ce:
         raise InternalServerException(ce.message)
